@@ -3,6 +3,32 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 
 The tool also provides support for CSV output, making it easy to integrate with other tools in your workflow. 
 
+# Usage
+```
+DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon 1.0
+Drew Alleman
+DataSurgeon (ds) extracts sensitive information from standard output for incident response,
+penetration testing, and CTF challenges, including emails, credit cards, URLs, IPs, MAC addresses,
+and SRV DNS records.
+
+USAGE:
+    ds [OPTIONS]
+
+OPTIONS:
+    -c, --credit_card        Extract credit card numbers from the target stream/file
+    -e, --email              Extract emails from the target stream/file
+    -f, --file <file>        File to extract information from
+    -h, --help               Print help information
+    -i, --ip_address         Extract IP addresses from the target stream/file
+    -m, --mac_address        Extract MAC addresses from the target stream/file
+    -o, --output <output>    Output's the results of the procedure to a output file (recommended for
+                             large files)
+    -s, --srv                Extract SRV DNS records from the target stream/file
+    -u, --url                Extract url's from the target stream/file
+    -V, --version            Print version information
+
+```
+
 # Project Goals
 * Able to recieve input from standard output
 * Argparse support
