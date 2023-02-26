@@ -29,6 +29,9 @@ OPTIONS:
 
 ```
 
+# Examples
+
+
 # Project Goals
 * Able to recieve input from standard output
 * Argparse support
