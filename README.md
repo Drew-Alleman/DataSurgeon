@@ -1,10 +1,12 @@
 # DataSurgeon (WIP)
 DataSurgeon (ds) is a tool designed for Incident repsonses, Pentests and CTF challenges
 
-# Features
-* Fast
+# Project Goals
+* Able to recieve input from standard output
+* Argparse support
+* CSV output
 
-# Extraction Features
+# Current Extraction Features
 * Emails
 * Credit Cards
 * URL's
@@ -12,7 +14,5 @@ DataSurgeon (ds) is a tool designed for Incident repsonses, Pentests and CTF cha
 * MAC Addresses
 * SRV DNS Records
 
-# To Do 
-* Support Standard Input 
-* Add argparse
-* Add CSV output
+## Want more?
+Please read the contributing guidelines then create a pull request with what information you want extracted.
