@@ -5,9 +5,9 @@ DataSurgeon (ds) is a tool designed for Incident repsonses, Pentests and CTF cha
 * Fast
 
 # Extraction Features
-* Email
+* Emails
 * Credit Cards
-* URLS
+* URL's
 * IP Addresses
 * MAC Addresses
 * SRV DNS Records
