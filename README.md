@@ -72,7 +72,8 @@ mac_address: 2023-02-26 00:35:56 - Sending 500 deauth frames to network: C4:41:1
 
 # Features
 * Accepts file's and input from standard output
-* Fast
+* Fast processing speeds
+* Windows and Linux support
 
 # Project Goals
 * CSV output
