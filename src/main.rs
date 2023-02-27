@@ -90,8 +90,10 @@ impl  DataSurgeon {
                 ("email", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()),
                 ("url", Regex::new(r"\b^[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)$\b").unwrap()),
                 ("ip_address", Regex::new(r"\b^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$\b").unwrap()),
+                ("ipv6_address", Regex::new(r"\b([0-9a-f]{1,4}:){1,1}(:[0-9a-f]{1,4}){1,6}\b").unwrap()),
                 ("srv_dns", Regex::new(r"\b((xn--)?[a-z0-9\w]+(-[a-z0-9]+)*\.)+[a-z]{2}\b").unwrap()),
                 ("mac_address", Regex::new(r"\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b").unwrap()),
+                ("credit_card", Regex::new(r"\b(?:\d[ -]?){15,16}\d\b").unwrap()),
             ].iter().cloned().collect();
         let keys: Vec<&str> = regex_map.keys().copied().collect();
         /*
@@ -212,6 +214,12 @@ fn main() -> Result<(), std::io::Error> {
             .help("Extracts IP addresses from the desired file")
             .takes_value(false)
         )
+        .arg(Arg::with_name("ip_address")
+            .short('6')
+            .long("ipv6_address")
+            .help("Extracts IPv6 addresses from the desired file")
+            .takes_value(false)
+        )
         .arg(Arg::with_name("mac_address")
             .short('m')
             .long("mac_address")
@@ -231,9 +239,9 @@ fn main() -> Result<(), std::io::Error> {
             .takes_value(false)
         )
         .arg(Arg::with_name("srv_dns")
-            .short('s')
-            .long("srv")
-            .help("Extract SRV DNS records")
+            .short('d')
+            .long("dns")
+            .help("Extract Domain Name System records")
             .takes_value(false)
         )
         .get_matches();
