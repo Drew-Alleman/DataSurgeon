@@ -10,7 +10,6 @@ git clone https://github.com/Drew-Alleman/DataSurgeon
 cd DataSurgeon
 cargo build --release
 cargo run -r -h  
-
 ```
 # Usage
 ```
@@ -50,12 +49,9 @@ When ran with no arguments ds with wait for standard input. With no specified qu
 ```
 $ wget -qO - https://stackoverflow.com/ | ./ds --files --junk
 files: apple-touch-icon.png
-files: min.js
 files: en.js
 files: en.js
 files: min.js
-files: StackExchange.ini
-files: en.js
 files: gps.ini
 files: topbar.ini
 files: illo-for-you.png
