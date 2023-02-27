@@ -29,9 +29,11 @@ OPTIONS:
 
 ```
 
+# Features
+* Accepts file's and input from standard output
+* Fast
+
 # Project Goals
-* Able to recieve input from standard output
-* Argparse support
 * CSV output
 
 # Current Extraction Features
