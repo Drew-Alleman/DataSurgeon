@@ -9,7 +9,7 @@ Install Rust [here](https://www.rust-lang.org/tools/install)
 git clone https://github.com/Drew-Alleman/DataSurgeon 
 cd DataSurgeon
 cargo build --release
-cargo run -r -h  
+cargo run
 ```
 # Usage
 ```
