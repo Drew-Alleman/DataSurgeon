@@ -42,7 +42,7 @@ OPTIONS:
     
 ```
 # Examples
-When ran with no arguments ds with wait for standard input. With no specified query (e.g: -url, -6) DataSurgeon search for all possible types of data. If your working with larger files it will be <b>SIGNIFICANTLY<b> faster to use individual queries.
+When ran with no arguments ds with wait for standard input. With no specified query (e.g: -url, -6) DataSurgeon search for all possible types of data. If your working with larger files it will be <b>SIGNIFICANTLY</b> faster to use individual queries.
 
 ## Extracting Files From a Remote Webiste
 --junk will attempt to remove any non critical strings from the display message
