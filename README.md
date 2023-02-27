@@ -17,9 +17,7 @@ USAGE:
 
 OPTIONS:
     -6, --ipv6_address       Extracts IPv6 addresses from the desired file
-    -c, --credit_card        Extract credit card numbers
     -d, --dns                Extract Domain Name System records
-    -D, --domain_users       Extract possible Windows domain user accounts
     -e, --email              Used to extract email addresses from the specifed file or output stream
     -f, --file <file>        File to extract information from
     -F, --files              Extract filenames
