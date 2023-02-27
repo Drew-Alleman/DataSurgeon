@@ -4,12 +4,14 @@ use std::fs::File;
 use clap::{Arg, App};
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader};
+use std::time::{Instant};
 
 /// Data structure for a raw_line of text data
 struct Data {
     raw_line: String,
     is_juicy: bool,
     content_type: &'static str,
+    exact: String,
 }
 
 impl Default for Data {
@@ -18,6 +20,7 @@ impl Default for Data {
             raw_line: "0".to_string(),
             content_type: "None",
             is_juicy: false,
+            exact: "None".to_string(),
         }
     }
 }
@@ -38,6 +41,11 @@ impl Data {
 
     }
 
+    fn to_exact_message(&self) -> String {
+        format!("{}: {}", self.content_type, self.exact)
+    }
+
+    
     // fn to_row(&self) -> String {
     //     /*
     //     Converts the line to a CSV row
@@ -51,14 +59,16 @@ impl Data {
         :param regex_map: Created regexes to search through
         */
         for (content_type, regex) in regex_map.iter() {
-            if regex.is_match(&self.raw_line) {
-                self.content_type = content_type;
-                self.is_juicy = true;
-                break;
+            if let Some(capture) = regex.captures(&self.raw_line) {
+                if let Some(file_name) = capture.get(1) {
+                    self.exact = file_name.as_str().to_owned();
+                    self.content_type = content_type;
+                    self.is_juicy = true;
+                    break;
+                }
             }
         }
     }
-
 }
 
 struct DataSurgeon {
@@ -88,11 +98,13 @@ impl  DataSurgeon {
         */
         let regex_map: HashMap<&str, Regex> = [
                 ("email", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()),
-                ("url", Regex::new(r"\b^[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)$\b").unwrap()),
-                ("ip_address", Regex::new(r"\b^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$\b").unwrap()),
-                ("ipv6_address", Regex::new(r"\b([0-9a-f]{1,4}:){1,1}(:[0-9a-f]{1,4}){1,6}\b").unwrap()),
+                ("url", Regex::new(r"(\w+://\S+)").unwrap()),
+                ("ip_address", Regex::new(r"\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b").unwrap()),
+                ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
                 ("srv_dns", Regex::new(r"\b((xn--)?[a-z0-9\w]+(-[a-z0-9]+)*\.)+[a-z]{2}\b").unwrap()),
-                ("mac_address", Regex::new(r"\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b").unwrap()),
+                ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
+                ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
+                ("domain_users", Regex::new(r"\b^[A-Za-z0-9._%+-]+(?:@[A-Za-z0-9._%+-]+)?@(?:.+\.)?(?:lan|local\.(?:home|company|corp)|workgroup|mshome\.net|domain(?:\.local)?)\.[A-Za-z]{2,4}$\b").unwrap()),
                 ("credit_card", Regex::new(r"\b(?:\d[ -]?){15,16}\d\b").unwrap()),
             ].iter().cloned().collect();
         let keys: Vec<&str> = regex_map.keys().copied().collect();
@@ -137,7 +149,15 @@ impl  DataSurgeon {
         let mut data: Data = Data::new(line.to_string());
         data.set_content_type(regex_map);
         if data.is_juicy {
-            println!("{}", data.to_message());
+            if self.matches.is_present("output") && !self.matches.value_of("output").unwrap_or_default().is_empty() {
+
+                return;
+            } 
+            if self.matches.is_present("junk") {
+                println!("{}", data.to_exact_message());
+            } else {
+                println!("{}", data.to_message());
+            }
         }
     }
 
@@ -170,13 +190,18 @@ impl  DataSurgeon {
     fn process(&mut self) {
         /* Searches for important information if the user specified a file othewise 
         the standard output is iterated through
-        */
+        */    
+        let time: bool = self.matches.is_present("time");
+        let start = Instant::now();
         let filename: &str =  self.matches.value_of("file").unwrap_or_default();
         if !filename.is_empty() {
             self.iterate_file(filename);
-            return
+        } else {
+            self.iterate_stdin();
         }
-        self.iterate_stdin();
+        if time {
+            println!("Time elapsed: {:?}", start.elapsed());
+        }
     }
 }
 
@@ -186,13 +211,6 @@ fn main() -> Result<(), std::io::Error> {
     2. Creates an instance of DataSurgeon
     3. Calls DataSurgeon.process()
     */
-
-    // .arg(Arg::with_name("output")
-    //     .short('o')
-    //     .long("output")
-    //     .help("Output's the results of the procedure to a local file (recommended for large files)")
-    //     .takes_value(true))
-
     let matches = App::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
         .version("1.0")
         .author("Drew Alleman")
@@ -201,20 +219,39 @@ fn main() -> Result<(), std::io::Error> {
             .short('f')
             .long("file")
             .help("File to extract information from")
-            .takes_value(true))
+            .takes_value(true)
+        )
+        .arg(Arg::with_name("junk")
+            .short('j')
+            .long("junk")
+            .help("Attempt to remove some of the junk information that might have been sent back")
+            .takes_value(false)
+        )
+        .arg(Arg::with_name("output")
+            .short('o')
+            .long("output")
+            .help("Output's the results of the procedure to a local file (recommended for large files)")
+            .takes_value(true)
+        )
+        .arg(Arg::with_name("time")
+            .short('t')
+            .long("time")
+            .help("Time how long the operation took")
+            .takes_value(false)
+        )
         .arg(Arg::with_name("email")
             .short('e')
             .long("email")
             .help("Used to extract email addresses from the specifed file or output stream")
             .takes_value(false)
-            )
+        )
         .arg(Arg::with_name("ip_address")
             .short('i')
             .long("ip_address")
             .help("Extracts IP addresses from the desired file")
             .takes_value(false)
         )
-        .arg(Arg::with_name("ip_address")
+        .arg(Arg::with_name("ipv6_address")
             .short('6')
             .long("ipv6_address")
             .help("Extracts IPv6 addresses from the desired file")
@@ -236,6 +273,18 @@ fn main() -> Result<(), std::io::Error> {
             .short('u')
             .long("url")
             .help("Extract url's")
+            .takes_value(false)
+        )
+        .arg(Arg::with_name("domain_users")
+            .short('D')
+            .long("domain_users")
+            .help("Extract possible Windows domain user accounts")
+            .takes_value(false)
+        )
+        .arg(Arg::with_name("files")
+            .short('F')
+            .long("files")
+            .help("Extract filenames")
             .takes_value(false)
         )
         .arg(Arg::with_name("srv_dns")
