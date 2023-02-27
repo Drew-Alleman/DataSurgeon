@@ -16,15 +16,13 @@ We welcome the following types of contributions:
 ## Process for Making Contributions
 
 ## Adding a new regex / extraction feature
-1. Create a new issue describing the problem or feature you would like to work on.
-2. Fork the project repository and create a new branch for your changes.
-3. Open main.rs in your text editor and search "Hello, Contributers!" and follow the guide below.
-4. Compare your process speeds to the latest version on a 5GB test file
-5. Submit a pull request with your changes.
+1. Fork the project repository and create a new branch for your changes.
+2. Open main.rs in your text editor and search "Hello, Contributers!" and follow the guide below.
+3. Compare your process speeds to the latest version on a 5GB test file
+4. Submit a pull request with your changes.
 
 ## Adding a new Feature
 To contribute to our project, please follow these steps:
-
 1. Create a new issue describing the problem or feature you would like to work on.
 2. Fork the project repository and create a new branch for your changes.
 3. Make the changes to the code, following our coding standards and best practices.
