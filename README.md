@@ -59,7 +59,7 @@ files: illo-home-search.png
 ```
 
 ## Extracting Mac Addresses From an Output File
-Here I am pulling all mac addresses found [autodeauths](https://github.com/Drew-Alleman/autodeauth) log file.
+Here I am pulling all mac addresses found in [autodeauth's](https://github.com/Drew-Alleman/autodeauth) log file.
 ```
 $ ./ds -f /var/log/autodeauth/log     
 mac_address: 2023-02-26 00:28:19 - Sending 500 deauth frames to network: BC:2E:48:E5:DE:FF -- PrivateNetwork
