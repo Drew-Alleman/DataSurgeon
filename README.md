@@ -28,6 +28,13 @@ OPTIONS:
     -V, --version         Print version information
     
 ```
+# Examples
+-m is used to extract mac addresses and -e is used to extract email addresses
+```
+wget -qO - https://help.gnome.org/users/gnome-help/stable/net-macaddress.html.en | ./ds -e -m
+mac_address:   colon. <span class="code">00:1B:44:11:3A:B7</span> is an example of a MAC address.</p>
+email: <p class="action_box doc-feedback">Got a comment? Spotted an error? Found the instructions unclear? <a class="button" href="mailto:docs-feedback@gnome.org?subject=Feedback%20on%20users/gnome-help/3.38/net-macaddress.page">Send feedback about this page.</a></p>
+```
 
 # Features
 * Accepts file's and input from standard output
