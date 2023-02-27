@@ -11,6 +11,9 @@ cd DataSurgeon
 cargo build --release
 cargo run -r -h  
 
+```
+# Usage
+```
 DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon 1.0
 Drew Alleman
 DataSurgeon (ds) extracts sensitive information from standard output for incident response,
