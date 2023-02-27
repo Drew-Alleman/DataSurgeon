@@ -3,9 +3,14 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 
 The tool also provides support for CSV output, making it easy to integrate with other tools in your workflow. 
 
-# Usage
+# Install
+Install Rust [here](https://www.rust-lang.org/tools/install)
 ```
-$ ./ds -h                                    
+git clone https://github.com/Drew-Alleman/DataSurgeon 
+cd DataSurgeon
+cargo build --release
+cargo run -r -h  
+
 DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon 1.0
 Drew Alleman
 DataSurgeon (ds) extracts sensitive information from standard output for incident response,
