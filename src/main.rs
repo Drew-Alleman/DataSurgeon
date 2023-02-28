@@ -106,7 +106,7 @@ impl  DataSurgeon {
             ("url", Regex::new(r"((?:https?|ftp)://[^\s/$.?#].[^\s]*)").unwrap()),
             ("ip_address", Regex::new(r"\b((?:\d{1,3}\.){3}\d{1,3})\b").unwrap()),
             ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
-            ("srv_dns", Regex::new(r"\b((xn--)?[a-z0-9\w]+(-[a-z0-9]+)*\.)+[a-z]{2}\b").unwrap()),
+            ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
             ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
             ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
         ].iter().cloned().collect();
@@ -275,25 +275,25 @@ fn main() -> Result<(), std::io::Error> {
         )
         .arg(Arg::with_name("ip_address")
             .short('i')
-            .long("ip_address")
+            .long("ip-address")
             .help("Extracts IP addresses from the desired file")
             .takes_value(false)
         )
         .arg(Arg::with_name("ipv6_address")
             .short('6')
-            .long("ipv6_address")
+            .long("ipv6-address")
             .help("Extracts IPv6 addresses from the desired file")
             .takes_value(false)
         )
         .arg(Arg::with_name("mac_address")
             .short('m')
-            .long("mac_address")
+            .long("mac-address")
             .help("Extract's MAC addresses")
             .takes_value(false)
         )
         .arg(Arg::with_name("credit_card")
             .short('c')
-            .long("credit_card")
+            .long("credit-card")
             .help("Extract credit card numbers")
             .takes_value(false)
         )
@@ -305,7 +305,7 @@ fn main() -> Result<(), std::io::Error> {
         )
         .arg(Arg::with_name("domain_users")
             .short('D')
-            .long("domain_users")
+            .long("domain-users")
             .help("Extract possible Windows domain user accounts")
             .takes_value(false)
         )
