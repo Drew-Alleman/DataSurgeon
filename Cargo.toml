@@ -8,4 +8,3 @@ edition = "2021"
 [dependencies]
 regex = "1.5"
 clap = "3.0"
-termcolor = "1.2.0"
