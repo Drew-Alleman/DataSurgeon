@@ -6,7 +6,7 @@ The tool also provides support for CSV output, making it easy to integrate with 
 # Quick Links
 * [Features](#features)
 * [Install](#install)
-* [Usage](#usage)
+* [Command Line Arguments](#command-line-arguments)
 * [Examples](#examples)
 * [Speed Tests](#speed-tests)
 * [Features](#features)
@@ -18,8 +18,10 @@ The tool also provides support for CSV output, making it easy to integrate with 
 
 ## Extractable Information 
 * Emails
+* Files
 * Credit Cards
 * URL's
+* Windows Domain Usernames
 * IPv4 Addresses and IPv6 addresses
 * MAC Addresses
 * SRV DNS Records
@@ -35,8 +37,10 @@ cd DataSurgeon
 cargo build --release
 cargo run
 ```
-# Usage
+# Command Line Arguments
 ```
+$ ds -h                                                                                                                                                             
+
 DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon 1.0
 Drew Alleman
 DataSurgeon (ds) extracts sensitive information from standard output for incident response,
@@ -48,7 +52,9 @@ USAGE:
 
 OPTIONS:
     -6, --ipv6_address       Extracts IPv6 addresses from the desired file
+    -c, --credit_card        Extract credit card numbers
     -d, --dns                Extract Domain Name System records
+    -D, --domain_users       Extract possible Windows domain user accounts
     -e, --email              Used to extract email addresses from the specifed file or output stream
     -f, --file <file>        File to extract information from
     -F, --files              Extract filenames
@@ -62,7 +68,7 @@ OPTIONS:
     -t, --time               Time how long the operation took
     -u, --url                Extract url's
     -V, --version            Print version information
-                                                      
+
     
 ```
 
