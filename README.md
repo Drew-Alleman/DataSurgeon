@@ -3,6 +3,29 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 
 The tool also provides support for CSV output, making it easy to integrate with other tools in your workflow. 
 
+# Quick Links
+* [Features](#features)
+* [Install](#install)
+* [Usage](#usage)
+* [Examples](#examples)
+* [Features](#features)
+* [Project Goals](#project-goals)
+
+# Features
+* Accepts file's and input from standard output
+* Supports Windows, Linux and MacOS
+
+## Extractable Information 
+* Emails
+* Credit Cards
+* URL's
+* IPv4 Addresses and IPv6 addresses
+* MAC Addresses
+* SRV DNS Records
+
+### Want more? 
+Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
+
 # Install
 Install Rust [here](https://www.rust-lang.org/tools/install)
 ```
@@ -79,12 +102,6 @@ mac_address: 2023-02-26 00:35:22 - Sending 500 deauth frames to network: 90:58:5
 mac_address: 2023-02-26 00:35:40 - Sending 500 deauth frames to network: DC:EB:69:BA:79:C9 -- HomeNet
 mac_address: 2023-02-26 00:35:56 - Sending 500 deauth frames to network: C4:41:1E:53:7D:8C -- TheCorp
 ```
-
-# Features
-* Accepts file's and input from standard output
-* Fast processing speeds
-* Windows and Linux support
-
 # Project Goals
 * CSV output
 
