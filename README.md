@@ -32,10 +32,7 @@ Please read the contributing guidelines [here](https://github.com/Drew-Alleman/D
 # Install
 Install Rust [here](https://www.rust-lang.org/tools/install)
 ```
-git clone https://github.com/Drew-Alleman/DataSurgeon 
-cd DataSurgeon
-cargo build --release
-cargo run
+wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install.sh | bash
 ```
 # Command Line Arguments
 ```
