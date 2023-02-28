@@ -7,8 +7,8 @@ The tool also provides support for CSV output, making it easy to integrate with 
 * [Features](#features)
 * [Install](#install)
 * [Command Line Arguments](#command-line-arguments)
-* [Speed Tests](#speed-tests)
 * [Examples](#examples)
+* [Speed Tests](#speed-tests)
 * [Project Goals](#project-goals)
 
 # Features
