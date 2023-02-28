@@ -38,11 +38,11 @@ wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/instal
 1. Install Rust [here](https://www.rust-lang.org/tools/install)
 2. Install Github [here](https://desktop.github.com/)
 3. Enter the line below in an elevated powershell window. 
-4. Relaunch terminal
 ```
 IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.ps1")
 ```
-When compiled the binary (ds) can be located /target/release/
+4. Relaunch terminal
+When complete you will be able to use ```ds``` from the command line anywhere.
 
 # Command Line Arguments
 ```
