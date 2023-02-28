@@ -34,13 +34,12 @@ Please read the contributing guidelines [here](https://github.com/Drew-Alleman/D
 Install Rust [here](https://www.rust-lang.org/tools/install)
 ### Linux Quick Install
 ```
-wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install.sh | bash
+wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | bash
 ```
 ### Windows 
+Enter the line below in an elevated powershell window. You will need to relaunch your terminal after the installation.
 ```
-git clone https://github.com/Drew-Alleman/DataSurgeon/
-cd DataSurgeon
-cargo build --release
+IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.ps1")
 ```
 When compiled the binary (ds) can be located /target/release/
 
