@@ -7,9 +7,8 @@ The tool also provides support for CSV output, making it easy to integrate with 
 * [Features](#features)
 * [Install](#install)
 * [Command Line Arguments](#command-line-arguments)
-* [Examples](#examples)
 * [Speed Tests](#speed-tests)
-* [Features](#features)
+* [Examples](#examples)
 * [Project Goals](#project-goals)
 
 # Features
@@ -91,8 +90,6 @@ With no specified query (e.g: -url, -6) ds will search through all possible type
 | cat test.txt \| ds -t -i -m -6     | 00h:02m:56s    |
 
 # Examples
-When ran with no arguments ds with wait for standard input. With no specified query (e.g: -url, -6) DataSurgeon search for all possible types of data. If your working with larger files it will be <b>SIGNIFICANTLY</b> faster to use individual queries.
-
 ## Extracting Files From a Remote Webiste
 Here I use ```wget``` to make a request to stackoverflow then I forward the body text to ds . The -F option will list all files found in the HTML source --junk is used to remove any extra text that might have been returned (such as extra html). Then the result of is sent to uniq which removes any non unique files found.
 ```
