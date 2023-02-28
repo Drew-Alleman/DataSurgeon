@@ -32,7 +32,7 @@ Please read the contributing guidelines [here](https://github.com/Drew-Alleman/D
 
 # Quick Install
 Install Rust [here](https://www.rust-lang.org/tools/install)
-### Linux Quick Install
+### Linux
 ```
 wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | bash
 ```
