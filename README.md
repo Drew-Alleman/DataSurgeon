@@ -14,6 +14,7 @@ The tool also provides support for CSV output, making it easy to integrate with 
 # Features
 * Accepts file's and input from standard output
 * Supports Windows, Linux and MacOS
+* Output results to a file
 
 ## Extractable Information 
 * Emails
