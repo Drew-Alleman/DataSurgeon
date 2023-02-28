@@ -116,7 +116,7 @@ files: ga.ini
 ## Extracting Mac Addresses From an Output File
 Here I am pulling all mac addresses found in [autodeauth's](https://github.com/Drew-Alleman/autodeauth) log file.
 ```
-$ ./ds -f /var/log/autodeauth/log     
+$ ./ds -m -f /var/log/autodeauth/log     
 mac_address: 2023-02-26 00:28:19 - Sending 500 deauth frames to network: BC:2E:48:E5:DE:FF -- PrivateNetwork
 mac_address: 2023-02-26 00:35:22 - Sending 500 deauth frames to network: 90:58:51:1C:C9:E1 -- TestNet
 mac_address: 2023-02-26 00:35:40 - Sending 500 deauth frames to network: DC:EB:69:BA:79:C9 -- HomeNet
