@@ -31,13 +31,16 @@ The tool also provides support for CSV output, making it easy to integrate with 
 Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
 
 # Quick Install
-Install Rust [here](https://www.rust-lang.org/tools/install)
 ### Linux
 ```
 wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | bash
 ```
+
 ### Windows 
-Enter the line below in an elevated powershell window. You will need to relaunch your terminal after the installation.
+1. Install Rust [here](https://www.rust-lang.org/tools/install)
+2. Install Github [here](https://desktop.github.com/)
+3. Enter the line below in an elevated powershell window. 
+4. Relaunch terminal
 ```
 IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.ps1")
 ```
