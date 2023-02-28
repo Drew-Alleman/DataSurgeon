@@ -41,7 +41,7 @@ wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/instal
 ```
 IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.ps1")
 ```
-4. Relaunch terminal
+4. Relaunch terminal <br> <br>
 When complete you will be able to use ```ds``` from the command line anywhere.
 
 # Command Line Arguments
