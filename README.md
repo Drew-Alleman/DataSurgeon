@@ -128,14 +128,3 @@ mac_address: 2023-02-26 00:35:56 - Sending 500 deauth frames to network: C4:41:1
 ```
 # Project Goals
 * CSV output
-
-# Current Extraction Features
-* Emails
-* Credit Cards
-* URL's
-* IPv4 Addresses and IPv6 addresses
-* MAC Addresses
-* SRV DNS Records
-
-## Want more?
-Please read the contributing guidelines then create a pull request with what information you want extracted.
