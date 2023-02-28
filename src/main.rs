@@ -45,7 +45,7 @@ impl Data {
         format!("{}: {}", self.content_type, self.exact)
     }
 
-    
+
     // fn to_row(&self) -> String {
     //     /*
     //     Converts the line to a CSV row
@@ -87,7 +87,7 @@ impl  DataSurgeon {
         The key is the name of the content you are searching for, 
         and the value is the associated regex.
 
-        please note how the regexes use \b syntax
+        ALL REGEXES MUST HAVE THE TARGET ITEM IN THE FIRST CAPTURE GROUP (just use chatGPT)
 
         let regex_map: HashMap<&str, Regex> = [
                 ("test_regex", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()),
@@ -97,15 +97,15 @@ impl  DataSurgeon {
         Note that the regex patterns must conform to Rust's regex syntax. You can test your regex patterns at https://regexr.com/.
         */
         let regex_map: HashMap<&str, Regex> = [
-                ("email", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()),
-                ("url", Regex::new(r"(\w+://\S+)").unwrap()),
+                ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
+                ("url", Regex::new(r"((?:https?|ftp)://[^\s/$.?#].[^\s]*)").unwrap()),
                 ("ip_address", Regex::new(r"\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b").unwrap()),
                 ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
                 ("srv_dns", Regex::new(r"\b((xn--)?[a-z0-9\w]+(-[a-z0-9]+)*\.)+[a-z]{2}\b").unwrap()),
                 ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
                 ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
-                ("domain_users", Regex::new(r"\b^[A-Za-z0-9._%+-]+(?:@[A-Za-z0-9._%+-]+)?@(?:.+\.)?(?:lan|local\.(?:home|company|corp)|workgroup|mshome\.net|domain(?:\.local)?)\.[A-Za-z]{2,4}$\b").unwrap()),
-                ("credit_card", Regex::new(r"\b(?:\d[ -]?){15,16}\d\b").unwrap()),
+                ("domain_users", Regex::new(r"\b^[A-Za-z0-9.%+-]+(?:@[A-Za-z0-9.%+-]+)?@(?:.+.)?(?:lan|local.(?:home|company|corp)|workgroup|mshome.net|domain(?:.local)?).[A-Za-z]{2,4}$\b").unwrap()),
+                ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
             ].iter().cloned().collect();
         let keys: Vec<&str> = regex_map.keys().copied().collect();
         /*
