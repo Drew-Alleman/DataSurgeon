@@ -100,7 +100,8 @@ files: opensearch.xml
 files: 2.png
 files: min.js
 files: en.js
-files:         .js
+files: .js
+files: min.js
 files: StackExchange.ini
 files: en.js
 files: gps.ini
@@ -108,13 +109,12 @@ files: topbar.ini
 files: illo-question.png
 files: illo-for-you.png
 files: illo-home-search.png
-files:  e.tar
+files: e.tar
 files: illo-integrations-left.png
 files: illo-integrations-right.png
 files: apple-touch-icon.png
 files: gtag.js
-files: ga.ini
-
+files: ga.i
 ```
 
 ## Extracting Mac Addresses From an Output File
