@@ -45,19 +45,29 @@ OPTIONS:
 When ran with no arguments ds with wait for standard input. With no specified query (e.g: -url, -6) DataSurgeon search for all possible types of data. If your working with larger files it will be <b>SIGNIFICANTLY</b> faster to use individual queries.
 
 ## Extracting Files From a Remote Webiste
---junk will attempt to remove any non critical strings from the display message
+Here a make a HTTP get request to stackoverflow. The -F option will list all files found in the HTML source --junk is used to remove any extra text that might have been returned. Then the result of this ouptut is send to uniq which removes any non unique lines.
 ```
-$ wget -qO - https://stackoverflow.com/ | ./ds --files --junk
+wget -qO - https://www.stackoverflow.com | ds -F --junk | uniq                                                                                      
 files: apple-touch-icon.png
-files: en.js
-files: en.js
+files: opensearch.xml
+files: 2.png
 files: min.js
+files: en.js
+files:         .js
+files: StackExchange.ini
+files: en.js
 files: gps.ini
 files: topbar.ini
-files: illo-for-you.png
+files: illo-question.png
 files: illo-for-you.png
 files: illo-home-search.png
-files: illo-home-search.png
+files:  e.tar
+files: illo-integrations-left.png
+files: illo-integrations-right.png
+files: apple-touch-icon.png
+files: gtag.js
+files: ga.ini
+
 ```
 
 ## Extracting Mac Addresses From an Output File
