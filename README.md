@@ -5,7 +5,7 @@ The tool also provides support for CSV output, making it easy to integrate with 
 
 # Quick Links
 * [Features](#features)
-* [Install](#install)
+* [Quick Install](#quick-install)
 * [Command Line Arguments](#command-line-arguments)
 * [Examples](#examples)
 * [Speed Tests](#speed-tests)
@@ -30,7 +30,7 @@ The tool also provides support for CSV output, making it easy to integrate with 
 ### Want more? 
 Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
 
-# Install
+# Quick Install
 Install Rust [here](https://www.rust-lang.org/tools/install)
 ### Linux Quick Install
 ```
