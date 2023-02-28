@@ -44,6 +44,11 @@ IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com
 4. Relaunch terminal <br> <br>
 When complete you will be able to use ```ds``` from the command line anywhere.
 
+### Mac
+```
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | sh
+```
+
 # Command Line Arguments
 ```
 $ ds -h 
