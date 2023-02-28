@@ -1,10 +1,12 @@
 use std::io;
 use regex::Regex;
 use std::fs::File;
+use std::io::Write;
 use clap::{Arg, App};
+use std::time::{Instant};
+use std::fs::OpenOptions;
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader};
-use std::time::{Instant};
 
 /// Data structure for a raw_line of text data
 struct Data {
@@ -61,7 +63,8 @@ impl Data {
         for (content_type, regex) in regex_map.iter() {
             if let Some(capture) = regex.captures(&self.raw_line) {
                 if let Some(file_name) = capture.get(1) {
-                    self.exact = file_name.as_str().to_owned();
+                    // Select first capture group and strip all whitespaces.
+                    self.exact = file_name.as_str().to_owned().chars().filter(|c| !c.is_whitespace()).collect::<String>();
                     self.content_type = content_type;
                     self.is_juicy = true;
                     break;
@@ -97,16 +100,16 @@ impl  DataSurgeon {
         Note that the regex patterns must conform to Rust's regex syntax. You can test your regex patterns at https://regexr.com/.
         */
         let regex_map: HashMap<&str, Regex> = [
-                ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
-                ("url", Regex::new(r"((?:https?|ftp)://[^\s/$.?#].[^\s]*)").unwrap()),
-                ("ip_address", Regex::new(r"\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b").unwrap()),
-                ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
-                ("srv_dns", Regex::new(r"\b((xn--)?[a-z0-9\w]+(-[a-z0-9]+)*\.)+[a-z]{2}\b").unwrap()),
-                ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
-                ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
-                ("domain_users", Regex::new(r"\b^[A-Za-z0-9.%+-]+(?:@[A-Za-z0-9.%+-]+)?@(?:.+.)?(?:lan|local.(?:home|company|corp)|workgroup|mshome.net|domain(?:.local)?).[A-Za-z]{2,4}$\b").unwrap()),
-                ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
-            ].iter().cloned().collect();
+            ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
+            ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
+            ("domain_users", Regex::new(r"\b(?i)(?:^|\s|\\)([a-zA-Z0-9._-]+)@(?:[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\.[a-zA-Z]{2,})\b").unwrap()),
+            ("url", Regex::new(r"((?:https?|ftp)://[^\s/$.?#].[^\s]*)").unwrap()),
+            ("ip_address", Regex::new(r"\b((?:\d{1,3}\.){3}\d{1,3})\b").unwrap()),
+            ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
+            ("srv_dns", Regex::new(r"\b((xn--)?[a-z0-9\w]+(-[a-z0-9]+)*\.)+[a-z]{2}\b").unwrap()),
+            ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
+            ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
+        ].iter().cloned().collect();
         let keys: Vec<&str> = regex_map.keys().copied().collect();
         /*
         If the user didn't specify any extraction choices (e.g: email, url, ip_address)
@@ -130,6 +133,16 @@ impl  DataSurgeon {
         filtered_map
     }
 
+    fn write_to_file(&self, message: String) {
+        let output_file = self.matches.value_of("output").unwrap_or_default();
+        let mut file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&output_file)
+            .expect("Failed to open output file");
+
+        writeln!(file, "{}", message).expect("Failed to write to output file");
+    }
 
     fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) {
         /* Handles a line of text and applies various regexes to determine if the 
@@ -150,7 +163,11 @@ impl  DataSurgeon {
         data.set_content_type(regex_map);
         if data.is_juicy {
             if self.matches.is_present("output") && !self.matches.value_of("output").unwrap_or_default().is_empty() {
-
+                let mut message: String = data.to_message();
+                if self.matches.is_present("junk") { 
+                    message = data.to_exact_message()
+                }
+                self.write_to_file(message);
                 return;
             } 
             if self.matches.is_present("junk") {
@@ -187,6 +204,17 @@ impl  DataSurgeon {
 
     }
 
+    fn display_time(&self, elapsed: f32) -> () {
+        /* Displays how long the program took
+        :param elapsed: Time in f32 that has elapsed.
+        */    
+        let hours = (elapsed / 3600.0) as u32;
+        let minutes = ((elapsed / 60.0) as u32) % 60;
+        let seconds = (elapsed as u32) % 60;
+        let hours12 = if hours == 0 { 0 } else if hours > 12 { hours - 12 } else { hours };
+        println!("Time elapsed: {:02}h:{:02}m:{:02}s", hours12, minutes, seconds);
+    }
+
     fn process(&mut self) {
         /* Searches for important information if the user specified a file othewise 
         the standard output is iterated through
@@ -200,7 +228,7 @@ impl  DataSurgeon {
             self.iterate_stdin();
         }
         if time {
-            println!("Time elapsed: {:?}", start.elapsed());
+            self.display_time(start.elapsed().as_secs_f32());
         }
     }
 }
