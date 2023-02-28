@@ -12,9 +12,10 @@ The tool also provides support for CSV output, making it easy to integrate with 
 * [Project Goals](#project-goals)
 
 # Features
-* Accepts file's and input from standard output
 * Supports Windows, Linux and MacOS
-* Output results to a file
+* Accepts files as input or input from standard output
+* Extracted information can be output to a secondary file
+
 
 ## Extractable Information 
 * Emails
