@@ -45,7 +45,7 @@ OPTIONS:
 When ran with no arguments ds with wait for standard input. With no specified query (e.g: -url, -6) DataSurgeon search for all possible types of data. If your working with larger files it will be <b>SIGNIFICANTLY</b> faster to use individual queries.
 
 ## Extracting Files From a Remote Webiste
-Here a make a HTTP get request to stackoverflow. The -F option will list all files found in the HTML source --junk is used to remove any extra text that might have been returned. Then the result of this ouptut is send to uniq which removes any non unique lines.
+Here I use ```wget``` to make a request to stackoverflow then I forward the body text to ds . The -F option will list all files found in the HTML source --junk is used to remove any extra text that might have been returned (such as extra html). Then the result of is sent to uniq which removes any non unique files found.
 ```
 wget -qO - https://www.stackoverflow.com | ds -F --junk | uniq                                                                                      
 files: apple-touch-icon.png
