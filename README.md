@@ -32,8 +32,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
     - SHA-3 224, SHA-3 256, SHA-3 384, SHA-3 512
     - MySQL 323, MySQL 41
     - NTLM
-    - Kerberos 5
-    - PostgreSQL
+    - -bcrypt
 
 ### Want more? 
 Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
