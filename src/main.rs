@@ -278,7 +278,7 @@ impl  DataSurgeon {
         self.is_output =  !self.output_file.is_empty();
         self.clean = self.matches.is_present("junk");
         self.thorough = self.matches.is_present("thorough");
-        self.hide_type = self.matches.is_present("hide-type");
+        self.hide_type = self.matches.is_present("hide");
         self.filename = self.matches.value_of("file").unwrap_or("").to_string();
     }
 
