@@ -5,8 +5,8 @@ use std::path::Path;
 use std::collections::HashMap;
 use std::time::Instant;
 use regex::Regex;
-use clap::{Arg, App};
-
+use clap::{Arg};
+use clap::Command;
 
 struct DataSurgeon {
     matches: clap::ArgMatches,
@@ -22,105 +22,105 @@ struct DataSurgeon {
 impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
-            matches: App::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
+            matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
         .version("1.0")
         .author("Drew Alleman")
         .about("DataSurgeon (ds) extracts sensitive information from standard input for incident response, penetration testing, and CTF challenges, including emails, credit cards, URLs, IPs, MAC addresses, and SRV DNS records. ")
-        .arg(Arg::with_name("file")
+        .arg(Arg::new("file")
             .short('f')
             .long("file")
             .help("File to extract information from")
-            .takes_value(true)
+            .action(clap::ArgAction::Set)
         )
-        .arg(Arg::with_name("clean")
+        .arg(Arg::new("clean")
             .short('C')
             .long("clean")
             .help("Attempt to remove some of the clean information that might have been sent back")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("thorough")
+        .arg(Arg::new("thorough")
             .short('T')
             .long("thorough")
             .help("Continues searching for all selected matches in each row, even if multiple types of matches are found. By default, the program stops at the first match found in each row. (Slower) (Good for CSV's and JSON files)")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("hide")
+        .arg(Arg::new("hide")
             .short('X')
-            .long("--hide")
+            .long("hide")
             .help("Hides the identifier string infront of the desired content (e.g: 'hash: ', 'url: ', 'email: ' will not be displayed.")
-            .takes_value(false)            
+           .action(clap::ArgAction::SetTrue)         
         )
-        .arg(Arg::with_name("output")
+        .arg(Arg::new("output")
             .short('o')
             .long("output")
             .help("Output's the results of the procedure to a local file (recommended for large files)")
-            .takes_value(true)
+            .action(clap::ArgAction::Set)
         )
-        .arg(Arg::with_name("time")
+        .arg(Arg::new("time")
             .short('t')
             .long("time")
             .help("Time how long the operation took")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue) 
         )
-        .arg(Arg::with_name("email")
+        .arg(Arg::new("email")
             .short('e')
             .long("email")
             .help("Used to extract email addresses from the specifed file or output stream")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("hashes")
+        .arg(Arg::new("hashes")
             .short('H')
             .long("hash")
             .help("Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or output stream")
-            .takes_value(false)            
+            .action(clap::ArgAction::SetTrue)       
         )
-        .arg(Arg::with_name("ip_address")
+        .arg(Arg::new("ip_address")
             .short('i')
             .long("ip-addr")
             .help("Extracts IP addresses from the desired file")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("ipv6_address")
+        .arg(Arg::new("ipv6_address")
             .short('6')
             .long("ipv6-addr")
             .help("Extracts IPv6 addresses from the desired file")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("mac_address")
+        .arg(Arg::new("mac_address")
             .short('m')
             .long("mac-addr")
             .help("Extract's MAC addresses")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("credit_card")
+        .arg(Arg::new("credit_card")
             .short('c')
             .long("credit-card")
             .help("Extract credit card numbers")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("url")
+        .arg(Arg::new("url")
             .short('u')
             .long("url")
             .help("Extract url's")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("domain_users")
+        .arg(Arg::new("domain_users")
             .short('D')
             .long("domain-users")
             .help("Extract possible Windows domain user accounts")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("files")
+        .arg(Arg::new("files")
             .short('F')
             .long("files")
             .help("Extract filenames")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::with_name("srv_dns")
+        .arg(Arg::new("srv_dns")
             .short('d')
             .long("dns")
             .help("Extract Domain Name System records")
-            .takes_value(false)
+            .action(clap::ArgAction::SetTrue)
         )
         .get_matches(),
             output_file: "".to_string(),
@@ -176,7 +176,7 @@ impl  DataSurgeon {
         /*
         If the user didn't specify any extraction choices (e.g: email, url, ip_address)
         */
-        if keys.iter().all(|value_name| !self.matches.is_present(value_name)) {
+        if keys.iter().all(|value_name| !self.matches.get_one::<bool>(value_name).unwrap()) {
             return regex_map;
         }
         /*
@@ -185,9 +185,9 @@ impl  DataSurgeon {
         let filtered_map: HashMap<&str, Regex> = keys
             .into_iter()
             .filter(|&key| {
-                let has_match = self.matches.is_present(key); 
+                let has_match = self.matches.get_one(key); 
                 let is_empty = regex_map[key].as_str().is_empty();
-                has_match && !is_empty
+                *has_match.unwrap() && !is_empty
 
             })
             .map(|key| (key, regex_map[key].clone()))
@@ -255,8 +255,8 @@ impl  DataSurgeon {
         if self.clean {
             filtered_line = line.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
             text = &filtered_line;
-        } else {
-            text = &line;
+        } else { 
+            text = line;
         }
         if self.hide_type {
             message = format!("{}", text);
@@ -274,12 +274,12 @@ impl  DataSurgeon {
         /*
         Used to build the attributes in the clap args
         */
-        self.output_file =  self.matches.value_of("output").unwrap_or_default().to_string();
+        self.output_file = self.matches.get_one::<String>("output").unwrap_or(&String::new()).to_string().to_owned();
         self.is_output =  !self.output_file.is_empty();
-        self.clean = self.matches.is_present("junk");
-        self.thorough = self.matches.is_present("thorough");
-        self.hide_type = self.matches.is_present("hide");
-        self.filename = self.matches.value_of("file").unwrap_or("").to_string();
+        self.clean = *self.matches.get_one::<bool>("clean").clone().unwrap();
+        self.thorough =  *self.matches.get_one::<bool>("thorough").clone().unwrap();
+        self.hide_type = *self.matches.get_one::<bool>("hide").clone().unwrap();
+        self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
     }
 
 
@@ -325,7 +325,6 @@ impl  DataSurgeon {
         /* Searches for important information if the user specified a file othewise 
         the standard output is iterated through
         */    
-        let time: bool = self.matches.is_present("time");
         self.build_arguments();
         let start = Instant::now();
         if !self.filename.is_empty() {
@@ -333,7 +332,7 @@ impl  DataSurgeon {
         } else {
             self.iterate_stdin();
         }
-        if time {
+        if *self.matches.get_one::<bool>("time").unwrap() {
             self.display_time(start.elapsed().as_secs_f32());
         }
     }
