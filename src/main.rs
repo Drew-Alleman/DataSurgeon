@@ -15,6 +15,7 @@ struct DataSurgeon {
     clean: bool,
     is_output: bool,
     thorough: bool,
+    hide_type: bool,
 }
 
 
@@ -43,6 +44,12 @@ impl Default for DataSurgeon {
             .help("Continues searching for all selected matches in each row, even if multiple types of matches are found. By default, the program stops at the first match found in each row. (Slower) (Good for CSV's and JSON files)")
             .takes_value(false)
         )
+        .arg(Arg::with_name("hide")
+            .short('X')
+            .long("--hide")
+            .help("Hides the identifier string infront of the desired content (e.g: 'hash: ', 'url: ', 'email: ' will not be displayed.")
+            .takes_value(false)            
+        )
         .arg(Arg::with_name("output")
             .short('o')
             .long("output")
@@ -63,7 +70,7 @@ impl Default for DataSurgeon {
         )
         .arg(Arg::with_name("hashes")
             .short('H')
-            .long("hashes")
+            .long("hash")
             .help("Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or output stream")
             .takes_value(false)            
         )
@@ -121,6 +128,7 @@ impl Default for DataSurgeon {
             clean: false,
             is_output: false,
             thorough: false,
+            hide_type: false,
         }
     }
 }
@@ -219,18 +227,15 @@ impl  DataSurgeon {
         if line.is_empty() {
             return;
         }
-        let mut message: String;
         for (content_type, regex) in regex_map.iter() {
             if let Some(capture) = regex.captures(&line) {
-                if let Some(file_name) = capture.get(1) {
+                if let Some(regex_match) = capture.get(1) {
                     // Select first capture group and strip all whitespaces. if --clean
                     if self.clean {
-                        let clean: String = file_name.as_str().to_owned().chars().filter(|c| !c.is_whitespace()).collect::<String>();
-                        message = format!("{}: {}", content_type, clean);
+                        self.handle_message(&regex_match.as_str().to_string(), &content_type);
                     } else {
-                        message = format!("{}: {}", content_type, line);
+                        self.handle_message(&line, &content_type);
                     }
-                    self.handle_message(message);
                     if !self.thorough {
                         break
                     }
@@ -240,11 +245,24 @@ impl  DataSurgeon {
     }
 
 
-    fn handle_message(&self, message: String) {
-        /* Prints or Writes a message
-        content is important
-        :param message: Message to dispaly or print
+    fn handle_message(&self, line: &String, content_type: &str) {
+        /* Prints or Writes a message to the user
+        :param message: Message to display or print
         */
+        let message: String;
+        let text: &str;
+        let filtered_line: String;
+        if self.clean {
+            filtered_line = line.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
+            text = &filtered_line;
+        } else {
+            text = &line;
+        }
+        if self.hide_type {
+            message = format!("{}", text);
+        } else {
+            message = format!("{}: {}", content_type, text);
+        }
         if self.is_output {
             self.write_to_file(message +"\n");
             return;
@@ -258,8 +276,9 @@ impl  DataSurgeon {
         */
         self.output_file =  self.matches.value_of("output").unwrap_or_default().to_string();
         self.is_output =  !self.output_file.is_empty();
-        self.clean = self.matches.is_present("clean");
+        self.clean = self.matches.is_present("junk");
         self.thorough = self.matches.is_present("thorough");
+        self.hide_type = self.matches.is_present("hide-type");
         self.filename = self.matches.value_of("file").unwrap_or("").to_string();
     }
 
