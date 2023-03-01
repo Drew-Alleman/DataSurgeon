@@ -124,19 +124,19 @@ Ram         12.0 GB (11.9 GB usable)
 
 ## Searching all data types
 
-Command         | Speed
+Command         | Speed         
 ----------------|----------------
-`cat test.txt \| ds -t` | 00h:01m:35s 
+`cat test.txt \| ds -t` | 00h:01m:35s |
 `ds -t -f test.txt` | 00h:01m:36s
 `cat test.txt \| ds -t -o output.txt` | 00h:01m:38s
 
 ## Using specific queries
 
-Command         | Speed
-----------------|----------------
-`cat test.txt \| ds -t -6` | 00h:00m:13s
-`cat test.txt \| ds -t -i -m` | 00h:00m:23
-`cat test.txt \| ds -t -F -6 -c` | 00h:00m:33s
+Command         | Speed          | Query Count
+----------------|----------------|----------------
+`cat test.txt \| ds -t -6` | 00h:00m:13s | 1
+`cat test.txt \| ds -t -i -m` | 00h:00m:23 | 2
+`cat test.txt \| ds -t -F -6 -c` | 00h:00m:33s | 3
 
 # Project Goals
 * CSV output
