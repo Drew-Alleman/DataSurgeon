@@ -2,6 +2,7 @@ use std::io;
 use regex::Regex;
 use std::fs::File;
 use std::io::Write;
+use std::path::Path;
 use clap::{Arg, App};
 use std::time::{Instant};
 use std::fs::OpenOptions;
@@ -30,8 +31,8 @@ impl Default for Data {
 impl Data {
     fn new(raw_line: String) -> Self {
         Self { 
-        	raw_line,
-        	..Default::default() 
+            raw_line,
+            ..Default::default() 
         }
     }
 
@@ -39,7 +40,7 @@ impl Data {
         /*
         Forms a messages from the content type and the text
         */
-    	format!("{}: {}", self.content_type, self.raw_line)
+        format!("{}: {}", self.content_type, self.raw_line)
 
     }
 
@@ -74,185 +75,34 @@ impl Data {
     }
 }
 
+
+
 struct DataSurgeon {
     matches: clap::ArgMatches,
+    output_file: String,
+    filename: String,
+    clean: bool,
+    is_output: bool,
 }
 
 
-impl  DataSurgeon {
-
-    fn build_regex_query(&self) -> HashMap<&'static str, Regex>{
-        /* Builds a regex query to search for important information 
-        :return: A HashMap containg the content type and the regex associated 
-
-        Hello, Contributers! 
-        To add a new regex, add a new raw_line to the following line. 
-        The key is the name of the content you are searching for, 
-        and the value is the associated regex.
-
-        ALL REGEXES MUST HAVE THE TARGET ITEM IN THE FIRST CAPTURE GROUP (just use chatGPT)
-
-        let regex_map: HashMap<&str, Regex> = [
-                ("test_regex", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()),
-            ].iter().cloned().collect();
-
-        The key is also used to display to the user what was found, so make it clear and concise, e.g., "email_address: Matched content."
-        Note that the regex patterns must conform to Rust's regex syntax. You can test your regex patterns at https://regexr.com/.
-        */
-        let regex_map: HashMap<&str, Regex> = [
-            ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
-            ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
-            ("domain_users", Regex::new(r"\b(?i)(?:^|\s|\\)([a-zA-Z0-9._-]+)@(?:[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\.[a-zA-Z]{2,})\b").unwrap()),
-            ("url", Regex::new(r"((?:https?|ftp)://[^\s/$.?#].[^\s]*)").unwrap()),
-            ("ip_address", Regex::new(r"^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})").unwrap()),
-            ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
-            ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
-            ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
-            ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
-        ].iter().cloned().collect();
-        let keys: Vec<&str> = regex_map.keys().copied().collect();
-        /*
-        If the user didn't specify any extraction choices (e.g: email, url, ip_address)
-        */
-        if keys.iter().all(|value_name| !self.matches.is_present(value_name)) {
-            return regex_map;
-        }
-        /*
-        If they did, then remove the ones they didnt select
-        */
-        let filtered_map: HashMap<&str, Regex> = keys
-            .into_iter()
-            .filter(|&key| {
-                let has_match = self.matches.is_present(key); 
-                let is_empty = regex_map[key].as_str().is_empty();
-                has_match && !is_empty
-
-            })
-            .map(|key| (key, regex_map[key].clone()))
-            .collect();
-        filtered_map
-    }
-
-    fn write_to_file(&self, message: String) {
-        let output_file = self.matches.value_of("output").unwrap_or_default();
-        let mut file = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&output_file)
-            .expect("Failed to open output file");
-
-        writeln!(file, "{}", message).expect("Failed to write to output file");
-    }
-
-    fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) {
-        /* Handles a line of text and applies various regexes to determine if the 
-        content is important
-        :param line: Line to process
-        :param regex_map: Regexes to apply
-        */
-        let line = match line {
-            Ok(line) => line,
-            Err(_) => {
-                return;
-            }
-        };
-        if line.is_empty() {
-            return;
-        }
-        let mut data: Data = Data::new(line.to_string());
-        data.set_content_type(regex_map);
-        if data.is_juicy {
-            if self.matches.is_present("output") && !self.matches.value_of("output").unwrap_or_default().is_empty() {
-                let mut message: String = data.to_message();
-                if self.matches.is_present("junk") { 
-                    message = data.to_exact_message()
-                }
-                self.write_to_file(message);
-                return;
-            } 
-            if self.matches.is_present("junk") {
-                println!("{}", data.to_exact_message());
-            } else {
-                println!("{}", data.to_message());
-            }
-        }
-    }
-
-    fn iterate_file(&self, path: &str) {
-        /* Iterates through the specified file to find important information
-        :param path: file to process
-        */
-        let file = File::open(path).unwrap();
-        let reader = BufReader::new(file);
-        let regex_map = self.build_regex_query();
-        for line in reader.lines() {
-            self.handle(&line, &regex_map);
-        }
-
-    }
-
-    fn iterate_stdin(&self) {
-        /* Iterates through the standard output to find important informatio
-        :param path: file to process
-        */
-        let stdin = io::stdin();
-        let reader = stdin.lock();
-        let regex_map = self.build_regex_query();
-        for line in reader.lines() {
-            self.handle(&line, &regex_map);
-        }
-
-    }
-
-    fn display_time(&self, elapsed: f32) -> () {
-        /* Displays how long the program took
-        :param elapsed: Time in f32 that has elapsed.
-        */    
-        let hours = (elapsed / 3600.0) as u32;
-        let minutes = ((elapsed / 60.0) as u32) % 60;
-        let seconds = (elapsed as u32) % 60;
-        let hours12 = if hours == 0 { 0 } else if hours > 12 { hours - 12 } else { hours };
-        println!("Time elapsed: {:02}h:{:02}m:{:02}s", hours12, minutes, seconds);
-    }
-
-    fn process(&mut self) {
-        /* Searches for important information if the user specified a file othewise 
-        the standard output is iterated through
-        */    
-        let time: bool = self.matches.is_present("time");
-        let start = Instant::now();
-        let filename: &str =  self.matches.value_of("file").unwrap_or_default();
-        if !filename.is_empty() {
-            self.iterate_file(filename);
-        } else {
-            self.iterate_stdin();
-        }
-        if time {
-            self.display_time(start.elapsed().as_secs_f32());
-        }
-    }
-}
-
-fn main() -> Result<(), std::io::Error> {
-    /*
-    1. Creates the arguments parser
-    2. Creates an instance of DataSurgeon
-    3. Calls DataSurgeon.process()
-    */
-    let matches = App::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
+impl Default for DataSurgeon {
+    fn default() -> Self {
+        Self {
+            matches: App::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
         .version("1.0")
         .author("Drew Alleman")
-        .about("DataSurgeon (ds) extracts sensitive information from standard output for incident response, penetration testing, and CTF challenges, including emails, credit cards, URLs, IPs, MAC addresses, and SRV DNS records. ")
+        .about("DataSurgeon (ds) extracts sensitive information from standard input for incident response, penetration testing, and CTF challenges, including emails, credit cards, URLs, IPs, MAC addresses, and SRV DNS records. ")
         .arg(Arg::with_name("file")
             .short('f')
             .long("file")
             .help("File to extract information from")
             .takes_value(true)
         )
-        .arg(Arg::with_name("junk")
-            .short('j')
-            .long("junk")
-            .help("Attempt to remove some of the junk information that might have been sent back")
+        .arg(Arg::with_name("clean")
+            .short('C')
+            .long("clean")
+            .help("Attempt to remove some of the clean information that might have been sent back")
             .takes_value(false)
         )
         .arg(Arg::with_name("output")
@@ -271,6 +121,12 @@ fn main() -> Result<(), std::io::Error> {
             .short('e')
             .long("email")
             .help("Used to extract email addresses from the specifed file or output stream")
+            .takes_value(false)
+        )
+        .arg(Arg::with_name("hashes")
+            .short('h')
+            .long("hashes")
+            .help("Used to extract supported hashes (MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-3 224, SHA-3 256, SHA-3 384, SHA-3 512, MySQL 323, MySQL 41, NTLM, Kerberos 5, PostgreSQL) from the specified file or output stream")
             .takes_value(false)
         )
         .arg(Arg::with_name("ip_address")
@@ -321,8 +177,195 @@ fn main() -> Result<(), std::io::Error> {
             .help("Extract Domain Name System records")
             .takes_value(false)
         )
-        .get_matches();
-    let mut ds = DataSurgeon {matches: matches};
+        .get_matches(),
+            output_file: "".to_string(),
+            filename: "".to_string(),
+            clean: false,
+            is_output: false,
+        }
+    }
+}
+
+
+impl  DataSurgeon {
+
+    fn new() -> Self {
+        Self { 
+            ..Default::default() 
+        }
+    }
+
+    fn build_regex_query(&self) -> HashMap<&'static str, Regex>{
+        /* Builds a regex query to search for important information 
+        :return: A HashMap containg the content type and the regex associated 
+
+        Hello, Contributers! 
+        To add a new regex, add a new raw_line to the following line. 
+        The key is the name of the content you are searching for, 
+        and the value is the associated regex.
+
+        ALL REGEXES MUST HAVE THE TARGET ITEM IN THE FIRST CAPTURE GROUP (just use chatGPT)
+
+        let regex_map: HashMap<&str, Regex> = [
+                ("test_regex", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()),
+            ].iter().cloned().collect();
+
+        The key is also used to display to the user what was found, so make it clear and concise, e.g., "email_address: Matched content."
+        Note that the regex patterns must conform to Rust's regex syntax. You can test your regex patterns at https://regexr.com/.
+        */
+        let regex_map: HashMap<&str, Regex> = [
+            ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
+            ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
+            ("domain_users", Regex::new(r"\b(?i)(?:^|\s|\\)([a-zA-Z0-9._-]+)@(?:[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\.[a-zA-Z]{2,})\b").unwrap()),
+            ("url", Regex::new(r"((?:https?|ftp)://[^\s/$.?#].[^\s]*)").unwrap()),
+            ("ip_address", Regex::new(r"\b((?:\d{1,3}\.){3}\d{1,3})\b").unwrap()),
+            ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
+            ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
+            ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
+            ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
+            ("hashes", Regex::new(r"\b((?:[0-9a-fA-F]{32})|(?:[0-9a-fA-F]{40})|(?:[0-9a-fA-F]{64})|(?:[0-9a-fA-F]{128})|(?:[0-9a-fA-F]{48})|(?:[0-9a-fA-F]{96})|(?:[a-zA-Z0-9+/]{60})|(?:[a-fA-F0-9]{44})|(?:[a-fA-F0-9]{84})|(?:[a-fA-F0-9]{88})|(?:[a-fA-F0-9]{172})|(?:[a-fA-F0-9]{182})|(?:[a-fA-F0-9]{150})|(?:[a-fA-F0-9]{152}))\b").unwrap())
+        ].iter().cloned().collect();
+        let keys: Vec<&str> = regex_map.keys().copied().collect();
+        /*
+        If the user didn't specify any extraction choices (e.g: email, url, ip_address)
+        */
+        if keys.iter().all(|value_name| !self.matches.is_present(value_name)) {
+            return regex_map;
+        }
+        /*
+        If they did, then remove the ones they didnt select
+        */
+        let filtered_map: HashMap<&str, Regex> = keys
+            .into_iter()
+            .filter(|&key| {
+                let has_match = self.matches.is_present(key); 
+                let is_empty = regex_map[key].as_str().is_empty();
+                has_match && !is_empty
+
+            })
+            .map(|key| (key, regex_map[key].clone()))
+            .collect();
+        filtered_map
+    }
+
+    fn write_to_file(&self, message: String) {
+        let mut file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&self.output_file)
+            .expect("Failed to open output file");
+
+        writeln!(file, "{}", message).expect("Failed to write to output file");
+    }
+
+    fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) {
+        /* Handles a line of text and applies various regexes to determine if the 
+        content is important
+        :param line: Line to process
+        :param regex_map: Regexes to apply
+        */
+        let line = match line {
+            Ok(line) => line,
+            Err(_) => {
+                return;
+            }
+        };
+        if line.is_empty() {
+            return;
+        }
+        let mut data: Data = Data::new(line.to_string());
+        data.set_content_type(regex_map);
+        if data.is_juicy {
+            if self.is_output {
+                let mut message: String = data.to_message();
+                if self.clean { 
+                    message = data.to_exact_message()
+                }
+                self.write_to_file(message);
+                return;
+            } 
+            if self.clean {
+                println!("{}", data.to_exact_message());
+            } else {
+                println!("{}", data.to_message());
+            }
+        }
+    }
+
+    fn build_arguments(&mut self) {
+        /*
+        Used to build the attributes in the clap args
+        */
+        self.output_file =  self.matches.value_of("output").unwrap_or_default().to_string();
+        self.is_output =  !self.output_file.is_empty();
+        self.clean = self.matches.is_present("junk");
+        self.filename = self.matches.value_of("file").unwrap_or("").to_string();
+    }
+
+
+    fn iterate_file(&mut self) {
+        /* Iterates through the specified file to find important information
+        :param path: file to process
+        */
+        let file = File::open(Path::new(self.filename.as_str())).unwrap();
+        let reader = BufReader::new(file);
+        let regex_map = self.build_regex_query();
+        for line in reader.lines() {
+            self.handle(&line, &regex_map);
+        }
+
+    }
+
+    fn iterate_stdin(&mut self) {
+        /* Iterates through the standard input to find important informatio
+        :param path: file to process
+        */
+        println!("[*] Reading standard input. If you meant to analyze a file use 'ds -f <FILE>' (ctrl+c to exit)");
+        let stdin = io::stdin();
+        let reader = stdin.lock();
+        let regex_map = self.build_regex_query();
+        for line in reader.lines() {
+            self.handle(&line, &regex_map);
+        }
+
+    }
+
+    fn display_time(&self, elapsed: f32) -> () {
+        /* Displays how long the program took
+        :param elapsed: Time in f32 that has elapsed.
+        */    
+        let hours = (elapsed / 3600.0) as u32;
+        let minutes = ((elapsed / 60.0) as u32) % 60;
+        let seconds = (elapsed as u32) % 60;
+        let hours12 = if hours == 0 { 0 } else if hours > 12 { hours - 12 } else { hours };
+        println!("Time elapsed: {:02}h:{:02}m:{:02}s", hours12, minutes, seconds);
+    }
+
+    fn process(&mut self) {
+        /* Searches for important information if the user specified a file othewise 
+        the standard output is iterated through
+        */    
+        let time: bool = self.matches.is_present("time");
+        self.build_arguments();
+        let start = Instant::now();
+        if !self.filename.is_empty() {
+            self.iterate_file();
+        } else {
+            self.iterate_stdin();
+        }
+        if time {
+            self.display_time(start.elapsed().as_secs_f32());
+        }
+    }
+}
+
+fn main() -> Result<(), std::io::Error> {
+    /*
+    1. Creates the arguments parser
+    2. Creates an instance of DataSurgeon
+    3. Calls DataSurgeon.process()
+    */
+    let mut ds = DataSurgeon::new();
     ds.process();
     Ok(())
 }
