@@ -1,80 +1,11 @@
 use std::io;
-use regex::Regex;
-use std::fs::File;
-use std::io::Write;
+use std::io::{BufRead, BufReader, Write};
+use std::fs::{File, OpenOptions};
 use std::path::Path;
-use clap::{Arg, App};
-use std::time::{Instant};
-use std::fs::OpenOptions;
 use std::collections::HashMap;
-use std::io::{BufRead, BufReader};
-
-/// Data structure for a raw_line of text data
-struct Data {
-    raw_line: String,
-    is_juicy: bool,
-    content_type: &'static str,
-    exact: String,
-}
-
-impl Default for Data {
-    fn default() -> Self {
-        Self {
-            raw_line: "0".to_string(),
-            content_type: "None",
-            is_juicy: false,
-            exact: "None".to_string(),
-        }
-    }
-}
-
-impl Data {
-    fn new(raw_line: String) -> Self {
-        Self { 
-            raw_line,
-            ..Default::default() 
-        }
-    }
-
-    fn to_message(&self) -> String {
-        /*
-        Forms a messages from the content type and the text
-        */
-        format!("{}: {}", self.content_type, self.raw_line)
-
-    }
-
-    fn to_exact_message(&self) -> String {
-        format!("{}: {}", self.content_type, self.exact)
-    }
-
-
-    // fn to_row(&self) -> String {
-    //     /*
-    //     Converts the line to a CSV row
-    //     */
-    //     format!("{},{}", self.content_type, self.raw_line)
-    // }
-
-    fn set_content_type(&mut self, regex_map: &HashMap<&'static str, Regex>) -> () {
-        /* Searches through the specified regexes to determine if the data 
-        provided is valuable information for the provided user
-        :param regex_map: Created regexes to search through
-        */
-        for (content_type, regex) in regex_map.iter() {
-            if let Some(capture) = regex.captures(&self.raw_line) {
-                if let Some(file_name) = capture.get(1) {
-                    // Select first capture group and strip all whitespaces.
-                    self.exact = file_name.as_str().to_owned().chars().filter(|c| !c.is_whitespace()).collect::<String>();
-                    self.content_type = content_type;
-                    self.is_juicy = true;
-                    break;
-                }
-            }
-        }
-    }
-}
-
+use std::time::Instant;
+use regex::Regex;
+use clap::{Arg, App};
 
 
 struct DataSurgeon {
@@ -83,6 +14,7 @@ struct DataSurgeon {
     filename: String,
     clean: bool,
     is_output: bool,
+    thorough: bool,
 }
 
 
@@ -103,6 +35,12 @@ impl Default for DataSurgeon {
             .short('C')
             .long("clean")
             .help("Attempt to remove some of the clean information that might have been sent back")
+            .takes_value(false)
+        )
+        .arg(Arg::with_name("thorough")
+            .short('T')
+            .long("thorough")
+            .help("Continues searching for all selected matches in each row, even if multiple types of matches are found. By default, the program stops at the first match found in each row. (Slower) (Good for CSV's and JSON files)")
             .takes_value(false)
         )
         .arg(Arg::with_name("output")
@@ -182,6 +120,7 @@ impl Default for DataSurgeon {
             filename: "".to_string(),
             clean: false,
             is_output: false,
+            thorough: false,
         }
     }
 }
@@ -258,11 +197,18 @@ impl  DataSurgeon {
         writeln!(file, "{}", message).expect("Failed to write to output file");
     }
 
-    fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) {
-        /* Handles a line of text and applies various regexes to determine if the 
-        content is important
+    // fn to_row(&self) -> String {
+    //     /*
+    //     Converts the line to a CSV row
+    //     */
+    //     format!("{},{}", self.content_type, self.raw_line)
+    // }
+
+    fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) -> () {
+        /* Searches through the specified regexes to determine if the data 
+        provided is valuable information for the provided user
         :param line: Line to process
-        :param regex_map: Regexes to apply
+        :param regex_map: Created regexes to search through
         */
         let line = match line {
             Ok(line) => line,
@@ -273,24 +219,38 @@ impl  DataSurgeon {
         if line.is_empty() {
             return;
         }
-        let mut data: Data = Data::new(line.to_string());
-        data.set_content_type(regex_map);
-        if data.is_juicy {
-            if self.is_output {
-                let mut message: String = data.to_message();
-                if self.clean { 
-                    message = data.to_exact_message()
+        let mut message: String;
+        for (content_type, regex) in regex_map.iter() {
+            if let Some(capture) = regex.captures(&line) {
+                if let Some(file_name) = capture.get(1) {
+                    // Select first capture group and strip all whitespaces. if --clean
+                    if self.clean {
+                        let clean: String = file_name.as_str().to_owned().chars().filter(|c| !c.is_whitespace()).collect::<String>();
+                        message = format!("{}: {}", content_type, clean);
+                    } else {
+                        message = format!("{}: {}", content_type, line);
+                    }
+                    self.handle_message(message);
+                    if !self.thorough {
+                        break
+                    }
                 }
-                self.write_to_file(message);
-                return;
-            } 
-            if self.clean {
-                println!("{}", data.to_exact_message());
-            } else {
-                println!("{}", data.to_message());
             }
         }
     }
+
+
+    fn handle_message(&self, message: String) {
+        /* Prints or Writes a message
+        content is important
+        :param message: Message to dispaly or print
+        */
+        if self.is_output {
+            self.write_to_file(message +"\n");
+            return;
+            }
+            print!("{}\n", message); 
+        }
 
     fn build_arguments(&mut self) {
         /*
@@ -298,7 +258,8 @@ impl  DataSurgeon {
         */
         self.output_file =  self.matches.value_of("output").unwrap_or_default().to_string();
         self.is_output =  !self.output_file.is_empty();
-        self.clean = self.matches.is_present("clean");
+        self.clean = self.matches.is_present("junk");
+        self.thorough = self.matches.is_present("thorough");
         self.filename = self.matches.value_of("file").unwrap_or("").to_string();
     }
 
