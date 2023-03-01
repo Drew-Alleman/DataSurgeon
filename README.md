@@ -79,18 +79,23 @@ OPTIONS:
     -e, --email              Used to extract email addresses from the specifed file or output stream
     -f, --file <file>        File to extract information from
     -F, --files              Extract filenames
-    -h, --hashes             Used to extract supported hashes (MD5, SHA-1, SHA-224, SHA-256,
-                             SHA-384, SHA-512, SHA-3 224, SHA-3 256, SHA-3 384, SHA-3 512, MySQL
-                             323, MySQL 41, NTLM, Kerberos 5, PostgreSQL) from the specified file or
-                             output stream
-        --help               Print help information
+    -h, --help               Print help information
+    -H, --hash               Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1,
+                             SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384,
+                             SHA3-512, MD4) from the specified file or output stream
     -i, --ip-addr            Extracts IP addresses from the desired file
     -m, --mac-addr           Extract's MAC addresses
     -o, --output <output>    Output's the results of the procedure to a local file (recommended for
                              large files)
     -t, --time               Time how long the operation took
+    -T, --thorough           Continues searching for all selected matches in each row, even if
+                             multiple types of matches are found. By default, the program stops at
+                             the first match found in each row. (Slower) (Good for CSV's and JSON
+                             files)
     -u, --url                Extract url's
-    -V, --version            Print version information                                                 
+    -V, --version            Print version information
+    -X, --hide               Hides the identifier string infront of the desired content (e.g: 'hash:
+                             ', 'url: ', 'email: ' will not be displayed.                          
 ```
 # Examples
 ## Extracting Files From a Remote Webiste
@@ -110,11 +115,11 @@ files: ga.i
 ```
 
 ## Extracting Mac Addresses From an Output File
-Here I am pulling all mac addresses found in [autodeauth's](https://github.com/Drew-Alleman/autodeauth) log file using the ```-m``` query.
+Here I am pulling all mac addresses found in [autodeauth's](https://github.com/Drew-Alleman/autodeauth) log file using the ```-m``` query. The ```--hide``` option will hide the identifer string infront of the results. In this case 'mac_address: ' is hidden from the output.
 ```
-$ ./ds -m -f /var/log/autodeauth/log     
-mac_address: 2023-02-26 00:28:19 - Sending 500 deauth frames to network: BC:2E:48:E5:DE:FF -- PrivateNetwork
-mac_address: 2023-02-26 00:35:22 - Sending 500 deauth frames to network: 90:58:51:1C:C9:E1 -- TestNet
+$ ./ds -m --hide -f /var/log/autodeauth/log     
+2023-02-26 00:28:19 - Sending 500 deauth frames to network: BC:2E:48:E5:DE:FF -- PrivateNetwork
+2023-02-26 00:35:22 - Sending 500 deauth frames to network: 90:58:51:1C:C9:E1 -- TestNet
 ```
 
 ## Reading all files in a directory
