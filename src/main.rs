@@ -124,7 +124,7 @@ impl Default for DataSurgeon {
             .takes_value(false)
         )
         .arg(Arg::with_name("hashes")
-            .short('h')
+            .short('H')
             .long("hashes")
             .help("Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or output stream")
             .takes_value(false)            
