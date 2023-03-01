@@ -156,4 +156,6 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -t -F -6 -c` | 00h:00m:33s | 3
 
 # Project Goals
-* CSV output
+* JSON and CSV output
+* Phone number extraction
+* SSN extraction
