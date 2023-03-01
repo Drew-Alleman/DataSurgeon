@@ -25,7 +25,7 @@ impl Default for DataSurgeon {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
         .version("1.0")
         .author("Drew Alleman")
-        .about("DataSurgeon (ds) extracts sensitive information from standard input for incident response, penetration testing, and CTF challenges, including emails, credit cards, URLs, IPs, MAC addresses, and SRV DNS records. ")
+        .about("DataSurgeon (ds) extracts sensitive information from standard input for incident response, penetration testing, and CTF challenges, including emails, \ncredit cards, URLs, IPs, MAC addresses, and SRV DNS records. ")
         .arg(Arg::new("file")
             .short('f')
             .long("file")
@@ -41,14 +41,14 @@ impl Default for DataSurgeon {
         .arg(Arg::new("thorough")
             .short('T')
             .long("thorough")
-            .help("Continues searching for all selected matches in each row, even if multiple types of matches are found. By default, the program stops at the first match found in each row. (Slower) (Good for CSV's and JSON files)")
+            .help("Continues searching for all selected matches in each row, even if multiple types of matches are found. \nBy default, the program stops at the first match found in each row. (Slower) (Good for CSV's and JSON files)")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("hide")
             .short('X')
             .long("hide")
             .help("Hides the identifier string infront of the desired content (e.g: 'hash: ', 'url: ', 'email: ' will not be displayed.")
-           .action(clap::ArgAction::SetTrue)         
+           .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("output")
             .short('o')
@@ -60,7 +60,7 @@ impl Default for DataSurgeon {
             .short('t')
             .long("time")
             .help("Time how long the operation took")
-            .action(clap::ArgAction::SetTrue) 
+            .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("email")
             .short('e')
@@ -71,8 +71,8 @@ impl Default for DataSurgeon {
         .arg(Arg::new("hashes")
             .short('H')
             .long("hash")
-            .help("Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or output stream")
-            .action(clap::ArgAction::SetTrue)       
+            .help("Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, \nSHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or output stream")
+            .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("ip_address")
             .short('i')
@@ -137,18 +137,18 @@ impl Default for DataSurgeon {
 impl  DataSurgeon {
 
     fn new() -> Self {
-        Self { 
-            ..Default::default() 
+        Self {
+            ..Default::default()
         }
     }
 
     fn build_regex_query(&self) -> HashMap<&'static str, Regex>{
-        /* Builds a regex query to search for important information 
-        :return: A HashMap containg the content type and the regex associated 
+        /* Builds a regex query to search for important information
+        :return: A HashMap containg the content type and the regex associated
 
-        Hello, Contributers! 
-        To add a new regex, add a new raw_line to the following line. 
-        The key is the name of the content you are searching for, 
+        Hello, Contributers!
+        To add a new regex, add a new raw_line to the following line.
+        The key is the name of the content you are searching for,
         and the value is the associated regex.
 
         ALL REGEXES MUST HAVE THE TARGET ITEM IN THE FIRST CAPTURE GROUP (just use chatGPT)
@@ -185,7 +185,7 @@ impl  DataSurgeon {
         let filtered_map: HashMap<&str, Regex> = keys
             .into_iter()
             .filter(|&key| {
-                let has_match = self.matches.get_one(key); 
+                let has_match = self.matches.get_one(key);
                 let is_empty = regex_map[key].as_str().is_empty();
                 *has_match.unwrap() && !is_empty
 
@@ -213,7 +213,7 @@ impl  DataSurgeon {
     // }
 
     fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) -> () {
-        /* Searches through the specified regexes to determine if the data 
+        /* Searches through the specified regexes to determine if the data
         provided is valuable information for the provided user
         :param line: Line to process
         :param regex_map: Created regexes to search through
@@ -255,7 +255,7 @@ impl  DataSurgeon {
         if self.clean {
             filtered_line = line.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
             text = &filtered_line;
-        } else { 
+        } else {
             text = line;
         }
         if self.hide_type {
@@ -267,7 +267,7 @@ impl  DataSurgeon {
             self.write_to_file(message +"\n");
             return;
             }
-            print!("{}\n", message); 
+            print!("{}\n", message);
         }
 
     fn build_arguments(&mut self) {
@@ -313,7 +313,7 @@ impl  DataSurgeon {
     fn display_time(&self, elapsed: f32) -> () {
         /* Displays how long the program took
         :param elapsed: Time in f32 that has elapsed.
-        */    
+        */
         let hours = (elapsed / 3600.0) as u32;
         let minutes = ((elapsed / 60.0) as u32) % 60;
         let seconds = (elapsed as u32) % 60;
@@ -322,9 +322,9 @@ impl  DataSurgeon {
     }
 
     fn process(&mut self) {
-        /* Searches for important information if the user specified a file othewise 
+        /* Searches for important information if the user specified a file othewise
         the standard output is iterated through
-        */    
+        */
         self.build_arguments();
         let start = Instant::now();
         if !self.filename.is_empty() {
