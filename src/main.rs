@@ -126,8 +126,8 @@ impl Default for DataSurgeon {
         .arg(Arg::with_name("hashes")
             .short('h')
             .long("hashes")
-            .help("Used to extract supported hashes (MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-3 224, SHA-3 256, SHA-3 384, SHA-3 512, MySQL 323, MySQL 41, NTLM, Kerberos 5, PostgreSQL) from the specified file or output stream")
-            .takes_value(false)
+            .help("Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or output stream")
+            .takes_value(false)            
         )
         .arg(Arg::with_name("ip_address")
             .short('i')
@@ -216,14 +216,14 @@ impl  DataSurgeon {
         let regex_map: HashMap<&str, Regex> = [
             ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
             ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
-            ("domain_users", Regex::new(r"\b(?i)(?:^|\s|\\)([a-zA-Z0-9._-]+)@(?:[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\.[a-zA-Z]{2,})\b").unwrap()),
+            ("domain_users", Regex::new(r"\b^([a-zA-Z]+\.[a-zA-Z]+|[a-zA-Z]+)[\w-]*(?=@([a-zA-Z0-9]{1,15}\.(local|network|lan|local)))\b").unwrap()),
             ("url", Regex::new(r"((?:https?|ftp)://[^\s/$.?#].[^\s]*)").unwrap()),
             ("ip_address", Regex::new(r"\b((?:\d{1,3}\.){3}\d{1,3})\b").unwrap()),
             ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
             ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
             ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
             ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
-            ("hashes", Regex::new(r"\b((?:[0-9a-fA-F]{32})|(?:[0-9a-fA-F]{40})|(?:[0-9a-fA-F]{64})|(?:[0-9a-fA-F]{128})|(?:[0-9a-fA-F]{48})|(?:[0-9a-fA-F]{96})|(?:[a-zA-Z0-9+/]{60})|(?:[a-fA-F0-9]{44})|(?:[a-fA-F0-9]{84})|(?:[a-fA-F0-9]{88})|(?:[a-fA-F0-9]{172})|(?:[a-fA-F0-9]{182})|(?:[a-fA-F0-9]{150})|(?:[a-fA-F0-9]{152}))\b").unwrap())
+            ("hashes", Regex::new(r"\b([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{56}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128}|[0-9a-fA-F]{56}|[0-9a-fA-F]{128}|[0-9a-fA-F]{224}|[0-9a-fA-F]{256}|[0-9a-fA-F]{384}|[0-9a-fA-F]{512}|[a-fA-F0-9*]{16}|[a-fA-F0-9*]{40}|[a-fA-F0-9*]{64}|[a-fA-F0-9*]{96}|[a-fA-F0-9*]{128})\b").unwrap())
         ].iter().cloned().collect();
         let keys: Vec<&str> = regex_map.keys().copied().collect();
         /*
