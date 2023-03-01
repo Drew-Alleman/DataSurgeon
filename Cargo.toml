@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 regex = "1.7.1"
-clap = "3.0.0"
+clap = "4.1.8"
+
