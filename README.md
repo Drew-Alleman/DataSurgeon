@@ -25,6 +25,14 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 * IPv4 Addresses and IPv6 addresses
 * MAC Addresses
 * SRV DNS Records
+* Extract Hashes
+    - MD4 & MD5
+    - SHA-1, SHA-224, SHA-256, SHA-384, SHA-512
+    - SHA-3 224, SHA-3 256, SHA-3 384, SHA-3 512
+    - MySQL 323, MySQL 41
+    - NTLM
+    - Kerberos 5
+    - PostgreSQL
 
 ### Want more? 
 Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
@@ -64,21 +72,25 @@ USAGE:
 OPTIONS:
     -6, --ipv6-addr          Extracts IPv6 addresses from the desired file
     -c, --credit-card        Extract credit card numbers
+    -C, --clean              Attempt to remove some of the clean information that might have been
+                             sent back
     -d, --dns                Extract Domain Name System records
     -D, --domain-users       Extract possible Windows domain user accounts
     -e, --email              Used to extract email addresses from the specifed file or output stream
     -f, --file <file>        File to extract information from
     -F, --files              Extract filenames
-    -h, --help               Print help information
+    -h, --hashes             Used to extract supported hashes (MD5, SHA-1, SHA-224, SHA-256,
+                             SHA-384, SHA-512, SHA-3 224, SHA-3 256, SHA-3 384, SHA-3 512, MySQL
+                             323, MySQL 41, NTLM, Kerberos 5, PostgreSQL) from the specified file or
+                             output stream
+        --help               Print help information
     -i, --ip-addr            Extracts IP addresses from the desired file
-    -C, --clean              Attempt to remove some of the junk information that might have been
-                             sent back
     -m, --mac-addr           Extract's MAC addresses
     -o, --output <output>    Output's the results of the procedure to a local file (recommended for
                              large files)
     -t, --time               Time how long the operation took
     -u, --url                Extract url's
-    -V, --version            Print version information                                                     
+    -V, --version            Print version information                                                 
 ```
 # Examples
 ## Extracting Files From a Remote Webiste
