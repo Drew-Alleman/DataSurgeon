@@ -216,7 +216,7 @@ impl  DataSurgeon {
         let regex_map: HashMap<&str, Regex> = [
             ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
             ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
-            ("domain_users", Regex::new(r"\b^([a-zA-Z]+\.[a-zA-Z]+|[a-zA-Z]+)[\w-]*(?=@([a-zA-Z0-9]{1,15}\.(local|network|lan|local)))\b").unwrap()),
+            ("domain_users", Regex::new(r"\b([a-zA-Z]+\.[a-zA-Z]+|[a-zA-Z]+)[\w-]*@([a-zA-Z0-9]{1,15}\.(local|network|lan|local))\b").unwrap()),
             ("url", Regex::new(r"((?:https?|ftp)://[^\s/$.?#].[^\s]*)").unwrap()),
             ("ip_address", Regex::new(r"\b((?:\d{1,3}\.){3}\d{1,3})\b").unwrap()),
             ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
