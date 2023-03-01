@@ -258,7 +258,7 @@ impl  DataSurgeon {
         */
         self.output_file =  self.matches.value_of("output").unwrap_or_default().to_string();
         self.is_output =  !self.output_file.is_empty();
-        self.clean = self.matches.is_present("junk");
+        self.clean = self.matches.is_present("clean");
         self.thorough = self.matches.is_present("thorough");
         self.filename = self.matches.value_of("file").unwrap_or("").to_string();
     }
