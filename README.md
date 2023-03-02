@@ -1,5 +1,5 @@
 # DataSurgeon (WIP)
-DataSurgeon (ds) is a versatile tool designed for incident response, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, hashes, credit cards, windows domain users, URLs, IP addresses, MAC addresses, and SRV DNS records.
+DataSurgeon (ds) is a versatile tool designed for incident response, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, hashes, credit cards, URLs, IP addresses, MAC addresses, and SRV DNS records.
 
 # Quick Links
 * [Features](#features)
@@ -22,7 +22,6 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 * Files
 * Credit Cards
 * URL's
-* Windows Domain Usernames
 * IPv4 Addresses and IPv6 addresses
 * MAC Addresses
 * SRV DNS Records
