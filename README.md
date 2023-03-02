@@ -150,5 +150,4 @@ Command         | Speed          | Query Count
 
 # Project Goals
 * JSON and CSV output
-* Phone number extraction
-* SSN extraction
+* Google API Keys
