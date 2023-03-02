@@ -1,5 +1,5 @@
 # DataSurgeon (WIP)
-DataSurgeon (ds) is a versatile tool designed for incident response, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, hashes, credit cards, URLs, IP addresses, MAC addresses, and SRV DNS records.
+DataSurgeon (ds) is a versatile tool designed for incident response, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, phone numbers, hashes, credit cards, URLs, IP addresses, MAC addresses, and SRV DNS records.
 
 # Quick Links
 * [Features](#features)
@@ -20,6 +20,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 ## Extractable Information 
 * Emails
 * Files
+* Phone numbers
 * Credit Cards
 * URL's
 * IPv4 Addresses and IPv6 addresses
@@ -59,7 +60,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/Drew-Alle
 # Command Line Arguments
 ```
 $ ds -h 
-DataSurgeon (ds) extracts sensitive information from standard input for incident response, penetration testing, and CTF challenges, including emails, credit cards, URLs, IPs, MAC addresses, and SRV DNS records.
+DataSurgeon (ds) extracts sensitive information from standard input for incident response, penetration testing, and CTF challenges, including emails, credit cards, URLs, IPs, MAC addresses, and SRV DNS records. 
 
 Usage: ds [OPTIONS]
 
@@ -71,7 +72,8 @@ Options:
   -o, --output <output>  Output's the results of the procedure to a local file (recommended for large files)
   -t, --time             Time how long the operation took
   -e, --email            Used to extract email addresses from the specifed file or output stream
-  -H, --hash             Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or output stream
+  -p, --phone            Used to extract numbers from the specifed file or output stream
+  -H, --hash             Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256,                              SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or                              output stream
   -i, --ip-addr          Extracts IP addresses from the desired file
   -6, --ipv6-addr        Extracts IPv6 addresses from the desired file
   -m, --mac-addr         Extract's MAC addresses
