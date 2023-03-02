@@ -221,8 +221,8 @@ impl  DataSurgeon {
         if line.is_empty() {
             return;
         }
+        let mut capture_list: Vec<regex::Match> = Vec::new();
         for (content_type, regex) in regex_map.iter() {
-            let mut capture_list: Vec<regex::Match> = Vec::new();
             if let Some(captures) = regex.captures(line) {
                 for capture in captures.iter() {
                     if let Some(capture) = capture {
