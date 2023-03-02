@@ -22,6 +22,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 * Files
 * Phone numbers
 * Credit Cards
+* Social Security Numbers
 * URL's
 * IPv4 Addresses and IPv6 addresses
 * MAC Addresses
@@ -67,7 +68,7 @@ Usage: ds [OPTIONS]
 Options:
   -f, --file <file>      File to extract information from
   -C, --clean            Attempt to remove some of the clean information that might have been sent back
-  -T, --thorough         Continues searching for all selected matches in each row, even if multiple types of matches are found. By default, the program stops at the first match found in each row. (Slower) (Good for CSV's and JSON files)
+  -T, --thorough         Continues searching for all selected matches in each row, even if multiple types of matches                            are found. By default, the program stops at the first match found in each row. (Slower) (Good                          for CSV's and JSON files)
   -X, --hide             Hides the identifier string infront of the desired content (e.g: 'hash: ', 'url: ', 'email: ' will not be displayed.
   -o, --output <output>  Output's the results of the procedure to a local file (recommended for large files)
   -t, --time             Time how long the operation took
@@ -81,6 +82,7 @@ Options:
   -u, --url              Extract url's
   -F, --files            Extract filenames
   -d, --dns              Extract Domain Name System records
+  -s, --social           Extract social security numbers
   -h, --help             Print help
   -V, --version          Print version
 ```
