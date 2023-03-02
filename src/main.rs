@@ -221,29 +221,27 @@ impl  DataSurgeon {
         if line.is_empty() {
             return;
         }
-        let mut capture_list: Vec<regex::Match> = Vec::new();
+        let mut capture_list: Vec<String> = Vec::new();
         for (content_type, regex) in regex_map.iter() {
-            if let Some(captures) = regex.captures(line) {
-                for capture in captures.iter() {
-                    if let Some(capture) = capture {
-                        // Select capture group and strip all whitespaces if --clean
-                        if capture_list.contains(&capture) {
+            for capture in regex.captures_iter(&line) {
+                if let Some(capture_match) = capture.get(1) {
+                    let filtered_capture: String = capture_match.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
+                    if capture_list.contains(&filtered_capture) {
                             continue;
                         }
-                        if self.clean {
-                            self.handle_message(&capture.as_str().to_string(), &content_type);
-                        } else {
-                            self.handle_message(&line, &content_type);
-                        }
-                        capture_list.push(capture);
+                    capture_list.push(filtered_capture.clone());
+                    if self.clean {
+                        self.handle_message(&filtered_capture, &content_type);
+                        continue;
+                    }
+                    self.handle_message(&line, &content_type);
+                    if !self.thorough {
+                        return; 
                     }
                 }
             }
-            if !self.thorough {
-                break;
         }
     }
-}
 
 
     fn handle_message(&self, line: &String, content_type: &str) {
