@@ -117,6 +117,24 @@ impl Default for DataSurgeon {
             .help("Extract filenames")
             .action(clap::ArgAction::SetTrue)
         )
+        .arg(Arg::new("bitcoin_wallet")
+            .short('b')
+            .long("bitcoin")
+            .help("Extract bitcoin wallets")
+            .action(clap::ArgAction::SetTrue)
+        )
+        .arg(Arg::new("aws_keys")
+            .short('a')
+            .long("aws")
+            .help("Extract AWS keys")
+            .action(clap::ArgAction::SetTrue)
+        )
+        // .arg(Arg::new("ssh_keys")
+        //     .short('S')
+        //     .long("ssh")
+        //     .help("Extract ssh keys")
+        //     .action(clap::ArgAction::SetTrue)
+        // )
         .arg(Arg::new("srv_dns")
             .short('d')
             .long("dns")
@@ -177,6 +195,9 @@ impl  DataSurgeon {
             ("phone_number", Regex::new(r"\b(\d{3}[-.\s]?\d{3}[-.\s]?\d{4})\b").unwrap()),
             ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
             ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
+            ("aws_keys", Regex::new(r"^(?i:ACCESS_KEY|aws_access_key_id|access_key|aws_secret_access_key|secret_key|aws_session_token)=(\S{20,})$").unwrap()),
+            ("bitcoin_wallet", Regex::new(r"\b([13][a-km-zA-HJ-NP-Z1-9]{25,34})\b").unwrap()),
+            // ("ssh_keys", Regex::new(r"(ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?)").unwrap())
             ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
             ("hashes", Regex::new(r"\b([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{56}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128}|[0-9a-fA-F]{56}|[0-9a-fA-F]{128}|[0-9a-fA-F]{224}|[0-9a-fA-F]{256}|[0-9a-fA-F]{384}|[0-9a-fA-F]{512}|[a-fA-F0-9*]{16}|[a-fA-F0-9*]{40}|[a-fA-F0-9*]{64}|[a-fA-F0-9*]{96}|[a-fA-F0-9*]{128})\b").unwrap())
         ].iter().cloned().collect();
