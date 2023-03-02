@@ -123,6 +123,12 @@ impl Default for DataSurgeon {
             .help("Extract Domain Name System records")
             .action(clap::ArgAction::SetTrue)
         )
+        .arg(Arg::new("social_security")
+            .short('s')
+            .long("social")
+            .help("Extract social security numbers")
+            .action(clap::ArgAction::SetTrue)
+        )
         .get_matches(),
             output_file: "".to_string(),
             filename: "".to_string(),
@@ -166,6 +172,7 @@ impl  DataSurgeon {
             ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
             ("url", Regex::new(r"((?:https?|ftp)://[^\s/$.?#].[^\s]*)").unwrap()),
             ("ip_address", Regex::new(r"\b((?:\d{1,3}\.){3}\d{1,3})\b").unwrap()),
+            ("social_security", Regex::new(r"\b(\d{3}-\d{2}-\d{4})\b").unwrap()),
             ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
             ("phone_number", Regex::new(r"\b(\d{3}[-.\s]?\d{3}[-.\s]?\d{4})\b").unwrap()),
             ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
