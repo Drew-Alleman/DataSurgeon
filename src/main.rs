@@ -263,7 +263,7 @@ impl  DataSurgeon {
             message = format!("{}: {}", content_type, text);
         }
         if self.is_output {
-            self.write_to_file(message +"\n");
+            self.write_to_file(message);
             return;
             }
             print!("{}\n", message); 
