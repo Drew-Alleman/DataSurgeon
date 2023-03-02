@@ -23,6 +23,8 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 * Phone numbers
 * Credit Cards
 * Social Security Numbers
+* AWS Keys
+* Bitcoin wallets
 * URL's
 * IPv4 Addresses and IPv6 addresses
 * MAC Addresses
@@ -81,10 +83,12 @@ Options:
   -c, --credit-card      Extract credit card numbers
   -u, --url              Extract url's
   -F, --files            Extract filenames
+  -b, --bitcoin          Extract bitcoin wallets
+  -a, --aws              Extract AWS keys
   -d, --dns              Extract Domain Name System records
   -s, --social           Extract social security numbers
   -h, --help             Print help
-  -V, --version          Print version
+  -V, --version          Print version                             
 ```
 # Examples
 ## Extracting Files From a Remote Webiste
