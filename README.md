@@ -118,7 +118,7 @@ $ ./ds -m --hide -f /var/log/autodeauth/log
 ## Reading all files in a directory
 The line below will read all files in the current directory then output any important data to ~/output.log
 ```
-$ find . -type f -exec cat {} \; | ds -C -t -o ~/output.log
+$ find . -type f -exec cat {} \; | ds -Cto ~/output.log
 ```
 
 # Speed Tests
@@ -136,17 +136,17 @@ Ram         12.0 GB (11.9 GB usable)
 
 Command         | Speed         
 ----------------|----------------
-`cat test.txt \| ds -t` | 00h:01m:35s |
-`ds -t -f test.txt` | 00h:01m:36s
-`cat test.txt \| ds -t -o output.txt` | 00h:01m:38s
+`cat test.txt \| ds -t` | 00h:02m:04s |
+`ds -t -f test.txt` | 00h:02m:05s
+`cat test.txt \| ds -t -o output.txt` | 00h:02m:06s
 
 ## Using specific queries
 
 Command         | Speed          | Query Count
 ----------------|----------------|----------------
-`cat test.txt \| ds -t -6` | 00h:00m:13s | 1
-`cat test.txt \| ds -t -i -m` | 00h:00m:23 | 2
-`cat test.txt \| ds -t -F -6 -c` | 00h:00m:33s | 3
+`cat test.txt \| ds -t -6` | 00h:00m:12s | 1
+`cat test.txt \| ds -t -i -m` | 00h:00m:22 | 2
+`cat test.txt \| ds -t -F -6 -c` | 00h:00m:32s | 3
 
 # Project Goals
 * JSON and CSV output
