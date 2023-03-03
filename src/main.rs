@@ -298,7 +298,7 @@ impl  DataSurgeon {
             (false, false) => format!("{}: {}", content_type, line),
         };
         if self.is_output {
-            self.write_to_file(&message);
+            self.write_to_file(message);
         } else {
             writeln!(std::io::stdout(), "{}", message).unwrap();
         }
