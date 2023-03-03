@@ -18,7 +18,6 @@ struct DataSurgeon {
     is_output: bool,
     thorough: bool,
     hide_type: bool,
-    file: File,
 }
 
 
@@ -156,7 +155,6 @@ impl Default for DataSurgeon {
             is_output: false,
             thorough: false,
             hide_type: false,
-            file: OpenOptions::new()
         }
     }
 }
@@ -227,6 +225,16 @@ impl  DataSurgeon {
         filtered_map
     }
 
+    fn write_to_file(&self, message: String) {
+        let mut file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&self.output_file)
+            .expect("Failed to open output file");
+
+        writeln!(file, "{}", message).expect("Failed to write to output file");
+    }
+
     // fn to_row(&self) -> String {
     //     /*
     //     Converts the line to a CSV row
@@ -275,7 +283,7 @@ impl  DataSurgeon {
             message = format!("{}: {}", content_type, line);
         }
         if self.is_output {
-            write!(self.file, "{}\n", message).expect("Failed to write to output file");
+            self.write_to_file(message);
             return;
         }
         print!("{}\n", message); 
@@ -291,13 +299,6 @@ impl  DataSurgeon {
         self.thorough =  *self.matches.get_one::<bool>("thorough").clone().unwrap();
         self.hide_type = *self.matches.get_one::<bool>("hide").clone().unwrap();
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
-        if self.is_output {
-            self.file = OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open(&self.output_file)
-                .expect("Failed to open output file");
-        }
     }
 
 
