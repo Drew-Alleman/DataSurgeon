@@ -18,6 +18,7 @@ struct DataSurgeon {
     is_output: bool,
     thorough: bool,
     hide_type: bool,
+    display: bool,
 }
 
 
@@ -130,6 +131,12 @@ impl Default for DataSurgeon {
             .help("Extract AWS keys")
             .action(clap::ArgAction::SetTrue)
         )
+        .arg(Arg::new("display")
+            .short('D')
+            .long("display")
+            .help("Also displays the filename the content was found in (https://github.com/Drew-Alleman/DataSurgeon#reading-all-files-in-a-directory)")
+            .action(clap::ArgAction::SetTrue)
+        )
         .arg(Arg::new("google")
             .short('g')
             .long("google")
@@ -161,6 +168,7 @@ impl Default for DataSurgeon {
             is_output: false,
             thorough: false,
             hide_type: false,
+            display: false,
         }
     }
 }
@@ -285,9 +293,17 @@ impl  DataSurgeon {
         */
         let message: String;
         if self.hide_type {
-            message = format!("{}", line);
+            if self.display_file {
+                message =  = format!("{}: {}", self.file, line);
+            } else {
+                message = format!("{}", line);
+            }
         } else {
-            message = format!("{}: {}", content_type, line);
+            if self.display_file {
+                message =  = format!("{}, {}: {}", self.file, content_type, line);
+            } else {
+                message = format!("{}: {}", content_type, line);
+            }
         }
         if self.is_output {
             self.write_to_file(message);
@@ -305,6 +321,7 @@ impl  DataSurgeon {
         self.clean = *self.matches.get_one::<bool>("clean").clone().unwrap();
         self.thorough =  *self.matches.get_one::<bool>("thorough").clone().unwrap();
         self.hide_type = *self.matches.get_one::<bool>("hide").clone().unwrap();
+        self.hide_type = *self.matches.get_one::<bool>("display").clone().unwrap();
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
     }
 
