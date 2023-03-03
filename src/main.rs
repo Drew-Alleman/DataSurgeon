@@ -133,7 +133,7 @@ impl Default for DataSurgeon {
         .arg(Arg::new("google")
             .short('g')
             .long("google")
-            .help("Extracts Google Service account private keys (credentials.json / secrets.json)")
+            .help("Extracts Google Service account private key ids (credentials.json / secrets.json)")
             .action(clap::ArgAction::SetTrue)
         )
         // .arg(Arg::new("ssh_keys")
