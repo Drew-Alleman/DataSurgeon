@@ -252,11 +252,11 @@ impl  DataSurgeon {
             for (content_type, regex) in regex_map.iter() {
                 for capture in regex.captures_iter(&line) {
                     if let Some(capture_match) = capture.get(1) {
-                        if !capture_set.insert(capture_match.clone()) {
+                        let filtered_capture: String = capture_match.to_string();
+                        if !capture_set.insert(filtered_capture.clone()) {
                             continue;
-                        }
-                        if self.clean {
-                            self.handle_message(&capture_match, &content_type);
+                        }                        if self.clean {
+                            self.handle_message(&filtered_capture, &content_type);
                             continue;
                         }
                         self.handle_message(&line, &content_type);
