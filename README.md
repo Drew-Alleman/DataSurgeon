@@ -71,13 +71,13 @@ Usage: ds [OPTIONS]
 Options:
   -f, --file <file>      File to extract information from
   -C, --clean            Attempt to remove some of the clean information that might have been sent back
-  -T, --thorough         Continues searching for all selected matches in each row, even if multiple types of matches                            are found. By default, the program stops at the first match found in each row. (Slower) (Good                          for CSV's and JSON files)
+  -T, --thorough         Continues searching for all selected matches in each row, even if multiple types of matches are found. By default, the program stops at the first match found                          in each row. (Slower) (Good for CSV's and JSON files)
   -X, --hide             Hides the identifier string infront of the desired content (e.g: 'hash: ', 'url: ', 'email: ' will not be displayed.
   -o, --output <output>  Output's the results of the procedure to a local file (recommended for large files)
   -t, --time             Time how long the operation took
   -e, --email            Used to extract email addresses from the specifed file or output stream
   -p, --phone            Used to extract numbers from the specifed file or output stream
-  -H, --hash             Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256,                              SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or                              output stream
+  -H, --hash             Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from                          the specified file or output stream
   -i, --ip-addr          Extracts IP addresses from the desired file
   -6, --ipv6-addr        Extracts IPv6 addresses from the desired file
   -m, --mac-addr         Extract's MAC addresses
