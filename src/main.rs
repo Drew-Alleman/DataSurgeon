@@ -1,4 +1,5 @@
 use std::io;
+use clap::Arg;
 use regex::Regex;
 use clap::Command;
 use std::vec::Vec;
@@ -275,7 +276,7 @@ impl  DataSurgeon {
         /* Prints or Writes a message to the user
         :param message: Message to display or print
         */
-        let filtered_line: String;
+        let message: String;
         if self.hide_type {
             message = format!("{}", line);
         } else {
