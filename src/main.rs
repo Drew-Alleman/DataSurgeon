@@ -5,7 +5,7 @@ use clap::Command;
 use std::vec::Vec;
 use std::path::Path;
 use std::time::Instant;
-use std::fs::OpenOptions;
+use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::collections::{HashSet, HashMap};
 
