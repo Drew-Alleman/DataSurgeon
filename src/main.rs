@@ -313,7 +313,7 @@ impl  DataSurgeon {
         self.clean = *self.matches.get_one::<bool>("clean").clone().unwrap();
         self.thorough =  *self.matches.get_one::<bool>("thorough").clone().unwrap();
         self.hide_type = *self.matches.get_one::<bool>("hide").clone().unwrap();
-        self.hide_type = *self.matches.get_one::<bool>("display").clone().unwrap();
+        self.display = *self.matches.get_one::<bool>("display").clone().unwrap();
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
     }
 
