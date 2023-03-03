@@ -3,10 +3,9 @@ use clap::Arg;
 use regex::Regex;
 use clap::Command;
 use std::vec::Vec;
-use std::fs::File;
 use std::path::Path;
 use std::time::Instant;
-use std::fs::{File, OpenOptions};
+use std::fs::OpenOptions;
 use std::io::{BufRead, BufReader, Write};
 use std::collections::{HashSet, HashMap};
 
@@ -19,7 +18,7 @@ struct DataSurgeon {
     is_output: bool,
     thorough: bool,
     hide_type: bool,
-    file: File
+    file: OpenOptions
 }
 
 
