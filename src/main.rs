@@ -247,31 +247,22 @@ impl  DataSurgeon {
         :param line: Line to process
         :param regex_map: Created regexes to search through
         */
-        let line = match line {
-            Ok(line) => line,
-            Err(_) => {
-                return;
-            }
-        };
-        if line.is_empty() {
-            return;
-        }
-        let mut capture_list: Vec<String> = Vec::new();
-        for (content_type, regex) in regex_map.iter() {
-            for capture in regex.captures_iter(&line) {
-                if let Some(capture_match) = capture.get(1) {
-                    let filtered_capture: String = capture_match.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
-                    if capture_list.contains(&filtered_capture) {
+        if let Ok(line) = line { 
+            let mut capture_set: HashSet<String> = HashSet::new();
+            for (content_type, regex) in regex_map.iter() {
+                for capture in regex.captures_iter(&line) {
+                    if let Some(capture_match) = capture.get(1) {
+                        if !capture_set.insert(capture_match.clone()) {
                             continue;
                         }
-                    capture_list.push(filtered_capture.clone());
-                    if self.clean {
-                        self.handle_message(&filtered_capture, &content_type);
-                        continue;
-                    }
-                    self.handle_message(&line, &content_type);
-                    if !self.thorough {
-                        return; 
+                        if self.clean {
+                            self.handle_message(&capture_match, &content_type);
+                            continue;
+                        }
+                        self.handle_message(&line, &content_type);
+                        if !self.thorough {
+                            return; 
+                        }
                     }
                 }
             }
