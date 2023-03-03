@@ -116,9 +116,14 @@ $ ./ds -m --hide -f /var/log/autodeauth/log
 ```
 
 ## Reading all files in a directory
-The line below will read all files in the current directory then output any important data to ~/output.log
+The line below will will read all files in the current directory recursively. The ```-D``` option is used to display the filename (-f is required for the filename to display)
 ```
-$ find . -type f -exec cat {} \; | ds -Cto ~/output.log
+$ find . -type f -exec ds -f {} -CD \; 
+./google.com/dump/modules.csv, files: explorer.js
+./google.com/dump/modules.csv, files: object.js
+./DataSurgeon/.git/config, url: https://github.com/Drew-Alleman/DataSurgeon
+./DataSurgeon/.git/hooks/fsmonitor-watchman.sample, url: https://facebook.github.io/watchman/)
+./DataSurgeon/.git/hooks/fsmonitor-watchman.sample, files: watchman-query.json
 ```
 
 # Speed Tests
