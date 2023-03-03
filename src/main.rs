@@ -291,7 +291,7 @@ impl  DataSurgeon {
         /* Prints or Writes a message to the user
         :param message: Message to display or print
         */
-        let message = match (self.hide_type, self.display_file) {
+        let message = match (self.hide_type, self.display) {
             (true, true) => format!("{}: {}", self.file, line),
             (true, false) => format!("{}", line),
             (false, true) => format!("{}, {}: {}", self.file, content_type, line),
