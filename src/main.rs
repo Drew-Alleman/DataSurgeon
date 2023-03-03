@@ -1,14 +1,13 @@
 use std::io;
-use std::vec::Vec;
-use std::io::{BufRead, BufReader, Write};
-use std::fs::{File, OpenOptions};
-use std::path::Path;
-use std::collections::HashMap;
-use std::time::Instant;
 use regex::Regex;
-use clap::{Arg};
 use clap::Command;
-use std::collections::HashSet;
+use std::vec::Vec;
+use std::path::Path;
+use std::time::Instant;
+use std::fs::{File, OpenOptions};
+use std::io::{BufRead, BufReader, Write};
+use std::collections::{HashSet, HashMap};
+
 
 struct DataSurgeon {
     matches: clap::ArgMatches,
@@ -253,14 +252,15 @@ impl  DataSurgeon {
             for (content_type, regex) in regex_map.iter() {
                 for capture in regex.captures_iter(&line) {
                     if let Some(capture_match) = capture.get(1) {
-                        let filtered_capture: String = capture_match.as_str().to_string();
+                        let filtered_capture: String = capture_match.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
                         if !capture_set.insert(filtered_capture.clone()) {
                             continue;
-                        }                        if self.clean {
-                            self.handle_message(&filtered_capture, &content_type);
-                            continue;
                         }
-                        self.handle_message(&line, &content_type);
+                        if self.clean {
+                            self.handle_message(&filtered_capture, &content_type);
+                        } else {
+                            self.handle_message(&line, &content_type);
+                        }
                         if !self.thorough {
                             return; 
                         }
@@ -275,26 +275,18 @@ impl  DataSurgeon {
         /* Prints or Writes a message to the user
         :param message: Message to display or print
         */
-        let message: String;
-        let text: &str;
         let filtered_line: String;
-        if self.clean {
-            filtered_line = line.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
-            text = &filtered_line;
-        } else { 
-            text = line;
-        }
         if self.hide_type {
-            message = format!("{}", text);
+            message = format!("{}", line);
         } else {
-            message = format!("{}: {}", content_type, text);
+            message = format!("{}: {}", content_type, line);
         }
         if self.is_output {
             self.write_to_file(message);
             return;
-            }
-            print!("{}\n", message); 
         }
+        print!("{}\n", message); 
+    }
 
     fn build_arguments(&mut self) {
         /*
