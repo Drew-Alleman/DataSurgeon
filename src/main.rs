@@ -275,7 +275,7 @@ impl  DataSurgeon {
             message = format!("{}: {}", content_type, line);
         }
         if self.is_output {
-            write!(self.file, "{}\n", message).expect("Failed to write to output file");
+            write(self.file, "{}\n", message).expect("Failed to write to output file");
             return;
         }
         print!("{}\n", message); 
