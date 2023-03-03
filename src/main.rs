@@ -1,11 +1,15 @@
+use std::io;
 use clap::Arg;
-use clap::Command;
 use regex::Regex;
-use std::collections::HashSet;
+use clap::Command;
+use std::vec::Vec;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 use std::time::Instant;
+use std::fs::{File, OpenOptions};
+use std::io::{BufRead, BufReader, Write};
+use std::collections::{HashSet, HashMap};
+
 
 struct DataSurgeon {
     matches: clap::ArgMatches,
@@ -15,7 +19,7 @@ struct DataSurgeon {
     is_output: bool,
     thorough: bool,
     hide_type: bool,
-    file: File,
+    file: File
 }
 
 
