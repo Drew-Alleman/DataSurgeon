@@ -292,7 +292,7 @@ impl  DataSurgeon {
         self.hide_type = *self.matches.get_one::<bool>("hide").clone().unwrap();
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
         if self.is_output {
-            let self.file = OpenOptions::new()
+            self.file = OpenOptions::new()
                 .create(true)
                 .append(true)
                 .open(&self.output_file)
