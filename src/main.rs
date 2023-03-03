@@ -291,25 +291,17 @@ impl  DataSurgeon {
         /* Prints or Writes a message to the user
         :param message: Message to display or print
         */
-        let message: String;
-        if self.hide_type {
-            if self.display_file {
-                message =  = format!("{}: {}", self.file, line);
-            } else {
-                message = format!("{}", line);
-            }
-        } else {
-            if self.display_file {
-                message =  = format!("{}, {}: {}", self.file, content_type, line);
-            } else {
-                message = format!("{}: {}", content_type, line);
-            }
-        }
+        let message = match (self.hide_type, self.display_file) {
+            (true, true) => format!("{}: {}", self.file, line),
+            (true, false) => format!("{}", line),
+            (false, true) => format!("{}, {}: {}", self.file, content_type, line),
+            (false, false) => format!("{}: {}", content_type, line),
+        };
         if self.is_output {
-            self.write_to_file(message);
-            return;
+            self.write_to_file(&message);
+        } else {
+            writeln!(std::io::stdout(), "{}", message).unwrap();
         }
-        print!("{}\n", message); 
     }
 
     fn build_arguments(&mut self) {
