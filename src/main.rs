@@ -18,7 +18,7 @@ struct DataSurgeon {
     is_output: bool,
     thorough: bool,
     hide_type: bool,
-    file: OpenOptions
+    file: File,
 }
 
 
