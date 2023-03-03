@@ -1,4 +1,4 @@
-# DataSurgeon (WIP)
+# DataSurgeon
 DataSurgeon (ds) is a versatile tool designed for incident response, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, phone numbers, hashes, credit cards, URLs, IP addresses, MAC addresses, and SRV DNS records.
 
 # Quick Links
