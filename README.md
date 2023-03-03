@@ -146,7 +146,7 @@ Command         | Speed          | Query Count
 ----------------|----------------|----------------
 `cat test.txt \| ds -t -6` | 00h:00m:12s | 1
 `cat test.txt \| ds -t -i -m` | 00h:00m:22 | 2
-`cat test.txt \| ds -t -F -6 -c` | 00h:00m:32s | 3
+`cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
 
 # Project Goals
 * JSON and CSV output
