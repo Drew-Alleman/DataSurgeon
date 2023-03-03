@@ -155,4 +155,3 @@ Command         | Speed          | Query Count
 
 # Project Goals
 * JSON and CSV output
-* Google API Keys
