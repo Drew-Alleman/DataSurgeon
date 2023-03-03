@@ -8,6 +8,7 @@ use std::time::Instant;
 use regex::Regex;
 use clap::{Arg};
 use clap::Command;
+use std::collections::HashSet;
 
 struct DataSurgeon {
     matches: clap::ArgMatches,
@@ -252,7 +253,7 @@ impl  DataSurgeon {
             for (content_type, regex) in regex_map.iter() {
                 for capture in regex.captures_iter(&line) {
                     if let Some(capture_match) = capture.get(1) {
-                        let filtered_capture: String = capture_match.to_string();
+                        let filtered_capture: String = capture_match.as_str().to_string();
                         if !capture_set.insert(filtered_capture.clone()) {
                             continue;
                         }                        if self.clean {
