@@ -10,28 +10,6 @@ use std::io::{BufRead, BufReader, Write};
 use std::collections::{HashSet, HashMap};
 
 
-struct FileWriter {
-    file: std::fs::File,
-    writer: std::io::BufWriter<std::fs::File>,
-}
-
-impl FileWriter {
-    fn new(filename: &str) -> std::io::Result<Self> {
-        let file = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(filename)?;
-        let writer = BufWriter::new(file.try_clone()?);
-        Ok(Self { file, writer })
-    }
-
-    fn write(&mut self, message: &str) -> std::io::Result<()> {
-        writeln!(self.writer, "{}", message)?;
-        self.writer.flush()?;
-        Ok(())
-    }
-}
-
 struct DataSurgeon {
     matches: clap::ArgMatches,
     output_file: String,
@@ -40,7 +18,6 @@ struct DataSurgeon {
     is_output: bool,
     thorough: bool,
     hide_type: bool,
-    file: File,
 }
 
 
@@ -111,12 +88,6 @@ impl Default for DataSurgeon {
             .help("Extracts IP addresses from the desired file")
             .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::new("google")
-            .short('g')
-            .long("google")
-            .help("Extracts Google Service account private keys (credentials.json / secrets.json)")
-            .action(clap::ArgAction::SetTrue)
-        )
         .arg(Arg::new("ipv6_address")
             .short('6')
             .long("ipv6-addr")
@@ -159,6 +130,12 @@ impl Default for DataSurgeon {
             .help("Extract AWS keys")
             .action(clap::ArgAction::SetTrue)
         )
+        .arg(Arg::new("google")
+            .short('g')
+            .long("google")
+            .help("Extracts Google Service account private keys (credentials.json / secrets.json)")
+            .action(clap::ArgAction::SetTrue)
+        )
         // .arg(Arg::new("ssh_keys")
         //     .short('S')
         //     .long("ssh")
@@ -184,7 +161,6 @@ impl Default for DataSurgeon {
             is_output: false,
             thorough: false,
             hide_type: false,
-            file: OpenOptions::new()
         }
     }
 }
@@ -224,9 +200,9 @@ impl  DataSurgeon {
             ("social_security", Regex::new(r"\b(\d{3}-\d{2}-\d{4})\b").unwrap()),
             ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
             ("phone_number", Regex::new(r"\b(\d{3}[-.\s]?\d{3}[-.\s]?\d{4})\b").unwrap()),
-            ("google", Regex::new(r#""private_key_id":\s*"(\w{40})""#).unwrap()),
             ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
             ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
+            ("google", Regex::new(r#""private_key_id":\s*"(\w{40})""#).unwrap()),
             ("aws_keys", Regex::new(r"^(?i:ACCESS_KEY|aws_access_key_id|access_key|aws_secret_access_key|secret_key|aws_session_token)=(\S{20,})$").unwrap()),
             ("bitcoin_wallet", Regex::new(r"\b([13][a-km-zA-HJ-NP-Z1-9]{25,34})\b").unwrap()),
             // ("ssh_keys", Regex::new(r"(ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?)").unwrap())
@@ -254,6 +230,16 @@ impl  DataSurgeon {
             .map(|key| (key, regex_map[key].clone()))
             .collect();
         filtered_map
+    }
+
+    fn write_to_file(&self, message: String) {
+        let mut file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&self.output_file)
+            .expect("Failed to open output file");
+
+        writeln!(file, "{}", message).expect("Failed to write to output file");
     }
 
     // fn to_row(&self) -> String {
@@ -304,7 +290,7 @@ impl  DataSurgeon {
             message = format!("{}: {}", content_type, line);
         }
         if self.is_output {
-            write!(self.file, "{}\n", message).expect("Failed to write to output file");
+            self.write_to_file(message);
             return;
         }
         print!("{}\n", message); 
@@ -320,13 +306,6 @@ impl  DataSurgeon {
         self.thorough =  *self.matches.get_one::<bool>("thorough").clone().unwrap();
         self.hide_type = *self.matches.get_one::<bool>("hide").clone().unwrap();
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
-        if self.is_output {
-            self.file = OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open(&self.output_file)
-                .expect("Failed to open output file");
-        }
     }
 
 
