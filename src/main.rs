@@ -275,7 +275,7 @@ impl  DataSurgeon {
             message = format!("{}: {}", content_type, line);
         }
         if self.is_output {
-            write(self.file, "{}\n", message).expect("Failed to write to output file");
+            write!(self.file, "{}\n", message).expect("Failed to write to output file");
             return;
         }
         print!("{}\n", message); 
@@ -292,7 +292,7 @@ impl  DataSurgeon {
         self.hide_type = *self.matches.get_one::<bool>("hide").clone().unwrap();
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
         if self.is_output {
-            let file = OpenOptions::new()
+            let self.file = OpenOptions::new()
                 .create(true)
                 .append(true)
                 .open(&self.output_file)
