@@ -22,6 +22,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 * Files
 * Phone numbers
 * Credit Cards
+* Google API Private Key ID's
 * Social Security Numbers
 * AWS Keys
 * Bitcoin wallets
