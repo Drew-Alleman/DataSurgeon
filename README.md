@@ -100,7 +100,7 @@ Here I use ```wget``` to make a request to stackoverflow then I forward the body
 ![preview](media/wget_preview.gif)
 
 ## Extracting Mac Addresses From an Output File
-Here I am pulling all mac addresses found in [autodeauth's](https://github.com/Drew-Alleman/autodeauth) log file using the ```-m``` query. The ```--hide``` option will hide the identifer string infront of the results. In this case 'mac_address: ' is hidden from the output. The ```-T``` option is used to check the same line multiple times for matches. Normallly when a match is found the tool moves on to the next line rather then checking again. 
+I am extracting all MAC addresses found in [autodeauth's](https://github.com/Drew-Alleman/autodeauth) log file using the ```-m``` query. To make the output cleaner, I'm using the ```--hide``` option to remove the identifier string 'mac_address: ' from the results. Additionally, I'm using the ```-T``` option to allow the tool to check the same line multiple times for matches. By default, the tool moves on to the next line after a match is found, but with ```-T``` it will keep searching for additional unique matches on the same line.
 ```
 $ ./ds -m -T --hide -f /var/log/autodeauth/log     
 2023-02-26 00:28:19 - Sending 500 deauth frames to network: BC:2E:48:E5:DE:FF -- PrivateNetwork
