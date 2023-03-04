@@ -2,23 +2,17 @@
 ![preview](media/main.gif)
 DataSurgeon (ds) is a versatile tool designed for incident response, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, phone numbers, hashes, credit cards, URLs, IP addresses, MAC addresses, SRV DNS records and a lot more!
 
+* Supports Windows, Linux and MacOS
+
 # Quick Links
-* [Features](#features)
+* [Extraction Features](#extraction-features )
 * [Quick Install](#quick-install)
 * [Command Line Arguments](#command-line-arguments)
 * [Examples](#examples)
 * [Speed Tests](#speed-tests)
 * [Project Goals](#project-goals)
 
-# Features
-* Supports Windows, Linux and MacOS
-* Fast Proccessing Speeds
-* Accepts files
-* Can process standard input
-* Extracted information can be output to a secondary file
-
-
-## Extractable Information 
+## Extraction Features 
 * Emails
 * Files
 * Phone numbers
