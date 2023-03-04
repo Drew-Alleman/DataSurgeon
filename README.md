@@ -43,18 +43,18 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
 
 # Quick Install
-Install [Rust](https://www.rust-lang.org/tools/install) and [Github](https://desktop.github.com/)
+To install DataSurgeon, you need to install [Rust](https://www.rust-lang.org/tools/install) and [GitHub](https://desktop.github.com/).
 ### Linux
 ```
 wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | bash
 ```
 
 ### Windows 
-Enter the line below in an elevated powershell window. 
+Run the following command in an elevated PowerShell window:
 ```
 IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.ps1")
 ```
-Relaunch your terminal and you will be able to use ```ds``` from the command line.
+After installing, restart your terminal, and you can use ```ds``` from the command line.
 
 ### Mac
 ```
