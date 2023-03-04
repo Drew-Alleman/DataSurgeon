@@ -1,5 +1,4 @@
 # DataSurgeon
-[![asciicast](https://asciinema.org/a/EdtJmW9JnaFPkTHXvdqnpxiq0.svg)](https://asciinema.org/a/EdtJmW9JnaFPkTHXvdqnpxiq0)
 DataSurgeon (ds) is a versatile tool designed for incident response, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, phone numbers, hashes, credit cards, URLs, IP addresses, MAC addresses, and SRV DNS records.
 
 # Quick Links
@@ -95,19 +94,7 @@ Options:
 # Examples
 ## Extracting Files From a Remote Webiste
 Here I use ```wget``` to make a request to stackoverflow then I forward the body text to ```ds``` . The ```-F``` option will list all files found. ```--clean``` is used to remove any extra text that might have been returned (such as extra html). Then the result of is sent to ```uniq``` which removes any non unique files found.
-```
-$ wget -qO - https://www.stackoverflow.com | ds -F --clean | uniq                                                                                      
-files: apple-touch-icon.png
-files: opensearch.xml
-files: 2.png
-files: min.js
-files: en.js
-files: illo-integrations-left.png
-files: illo-integrations-right.png
-files: apple-touch-icon.png
-files: gtag.js
-files: ga.i
-```
+![preview](media/wget_preview.gif)
 
 ## Extracting Mac Addresses From an Output File
 Here I am pulling all mac addresses found in [autodeauth's](https://github.com/Drew-Alleman/autodeauth) log file using the ```-m``` query. The ```--hide``` option will hide the identifer string infront of the results. In this case 'mac_address: ' is hidden from the output.
