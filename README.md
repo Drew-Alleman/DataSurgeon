@@ -108,12 +108,9 @@ $ ./ds -m --hide -f /var/log/autodeauth/log
 The line below will will read all files in the current directory recursively. The ```-D``` option is used to display the filename (-f is required for the filename to display)
 ```
 $ find . -type f -exec ds -f {} -CD \; 
-./google.com/dump/modules.csv, files: explorer.js
-./google.com/dump/modules.csv, files: object.js
-./DataSurgeon/.git/config, url: https://github.com/Drew-Alleman/DataSurgeon
-./DataSurgeon/.git/hooks/fsmonitor-watchman.sample, url: https://facebook.github.io/watchman/)
-./DataSurgeon/.git/hooks/fsmonitor-watchman.sample, files: watchman-query.json
 ```
+![preview](media/directory_search.gif)
+
 
 # Speed Tests
 When no specific query is provided, ```ds``` will search through all possible types of data, which is <b>SIGNIFICANTLY</b> slower than using individual queries. The slowest query is ```--files```. Its also slightly faster to use ```cat``` to pipe the data to ```ds```. 
