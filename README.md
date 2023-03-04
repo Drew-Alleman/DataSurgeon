@@ -11,7 +11,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 * [Project Goals](#project-goals)
 
 # Features
-* Supports Windows, Linux and MacOS
+* Supports Windows, Linux and MacOS (Termux works, but no quick install yet)
 * Fast Proccessing Speeds
 * Accepts files
 * Can process standard input
