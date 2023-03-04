@@ -64,32 +64,34 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/Drew-Alle
 # Command Line Arguments
 ```
 $ ds -h 
-DataSurgeon (ds) extracts sensitive information from standard input for incident response, penetration testing, and CTF challenges, including emails, credit cards, URLs, IPs, MAC addresses, and SRV DNS records. 
+Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.
 
 Usage: ds [OPTIONS]
 
 Options:
   -f, --file <file>      File to extract information from
-  -C, --clean            Attempt to remove some of the clean information that might have been sent back
-  -T, --thorough         Continues searching for all selected matches in each row, even if multiple types of matches are found. By default, the program stops at the first match found                          in each row. (Slower) (Good for CSV's and JSON files)
+  -C, --clean            Only displays the matched result, rather than the entire line
+  -T, --thorough         Doesn't stop at first match (useful for -C if multiple unique matches are on the same line
+  -D, --display           Displays the filename assoicated with the content found (https://github.com/Drew-Alleman/DataSurgeon#reading-all-files-in-a-directory)
   -X, --hide             Hides the identifier string infront of the desired content (e.g: 'hash: ', 'url: ', 'email: ' will not be displayed.
   -o, --output <output>  Output's the results of the procedure to a local file (recommended for large files)
   -t, --time             Time how long the operation took
-  -e, --email            Used to extract email addresses from the specifed file or output stream
-  -p, --phone            Used to extract numbers from the specifed file or output stream
-  -H, --hash             Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from                          the specified file or output stream
-  -i, --ip-addr          Extracts IP addresses from the desired file
-  -6, --ipv6-addr        Extracts IPv6 addresses from the desired file
-  -m, --mac-addr         Extract's MAC addresses
+  -e, --email            Extract email addresses
+  -p, --phone            Extracts phone numbers
+  -H, --hash             Extract hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4)
+  -i, --ip-addr          Extract IP addresses
+  -6, --ipv6-addr        Extract IPv6 addresses
+  -m, --mac-addr         Extract MAC addresses
   -c, --credit-card      Extract credit card numbers
-  -u, --url              Extract url's
+  -u, --url              Extract urls
   -F, --files            Extract filenames
   -b, --bitcoin          Extract bitcoin wallets
   -a, --aws              Extract AWS keys
+  -g, --google           Extract Google service account private key ids (used for google automations services)
   -d, --dns              Extract Domain Name System records
   -s, --social           Extract social security numbers
   -h, --help             Print help
-  -V, --version          Print version                             
+  -V, --version          Print version                         
 ```
 # Examples
 ## Extracting Files From a Remote Webiste
