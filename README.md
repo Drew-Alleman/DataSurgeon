@@ -108,9 +108,9 @@ $ ./ds -m --hide -f /var/log/autodeauth/log
 ```
 
 ## Reading all files in a directory
-The line below will will read all files in the current directory recursively. The ```-D``` option is used to display the filename (-f is required for the filename to display)
+The line below will will read all files in the current directory recursively. The ```-D``` option is used to display the filename (-f is required for the filename to display) and -e used to search for emails.
 ```
-$ find . -type f -exec ds -f {} -CD \; 
+$ find . -type f -exec ds -f {} -CDe \;
 ```
 ![preview](media/directory_search.gif)
 
