@@ -27,24 +27,31 @@ impl Default for DataSurgeon {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
         .version("1.0")
-        .author("Drew Alleman")
-        .about("DataSurgeon (ds) extracts sensitive information from standard input for incident response, penetration testing, and CTF challenges, including emails, credit cards, URLs, IPs, MAC addresses, and SRV DNS records. ")
+        .author("https://github.com/Drew-Alleman/DataSurgeon")
+        .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
             .short('f')
             .long("file")
             .help("File to extract information from")
             .action(clap::ArgAction::Set)
         )
-        .arg(Arg::new("clean")
+        .arg(
+            Arg::new("clean")
             .short('C')
             .long("clean")
-            .help("Attempt to remove some of the clean information that might have been sent back")
+            .help("Only displays the matched result, rather than the entire line")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("thorough")
             .short('T')
             .long("thorough")
-            .help("Continues searching for all selected matches in each row, even if multiple types of matches are found. By default, the program stops at the first match found in each row. (Slower) (Good for CSV's and JSON files)")
+            .help("Doesn't stop at first match (useful for -C if multiple unique matches are on the same line")
+            .action(clap::ArgAction::SetTrue)
+        )
+        .arg(Arg::new("display")
+            .short('D')
+            .long("display")
+            .help(" Displays the filename assoicated with the content found (https://github.com/Drew-Alleman/DataSurgeon#reading-all-files-in-a-directory)")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("hide")
@@ -68,37 +75,37 @@ impl Default for DataSurgeon {
         .arg(Arg::new("email")
             .short('e')
             .long("email")
-            .help("Used to extract email addresses from the specifed file or output stream")
+            .help("Extract email addresses")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("phone_number")
             .short('p')
             .long("phone")
-            .help("Used to extract numbers from the specifed file or output stream")
+            .help("Extracts phone numbers")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("hashes")
             .short('H')
             .long("hash")
-            .help("Used to extract supported hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4) from the specified file or output stream")
+            .help("Extract hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4)")
             .action(clap::ArgAction::SetTrue)       
         )
         .arg(Arg::new("ip_address")
             .short('i')
             .long("ip-addr")
-            .help("Extracts IP addresses from the desired file")
+            .help("Extract IP addresses")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("ipv6_address")
             .short('6')
             .long("ipv6-addr")
-            .help("Extracts IPv6 addresses from the desired file")
+            .help("Extract IPv6 addresses")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("mac_address")
             .short('m')
             .long("mac-addr")
-            .help("Extract's MAC addresses")
+            .help("Extract MAC addresses")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("credit_card")
@@ -110,7 +117,7 @@ impl Default for DataSurgeon {
         .arg(Arg::new("url")
             .short('u')
             .long("url")
-            .help("Extract url's")
+            .help("Extract urls")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("files")
@@ -131,16 +138,10 @@ impl Default for DataSurgeon {
             .help("Extract AWS keys")
             .action(clap::ArgAction::SetTrue)
         )
-        .arg(Arg::new("display")
-            .short('D')
-            .long("display")
-            .help("Also displays the filename the content was found in (https://github.com/Drew-Alleman/DataSurgeon#reading-all-files-in-a-directory)")
-            .action(clap::ArgAction::SetTrue)
-        )
         .arg(Arg::new("google")
             .short('g')
             .long("google")
-            .help("Extracts Google Service account private key ids (credentials.json / secrets.json)")
+            .help("Extract Google service account private key ids (used for google automations services)")
             .action(clap::ArgAction::SetTrue)
         )
         // .arg(Arg::new("ssh_keys")
@@ -194,7 +195,7 @@ impl  DataSurgeon {
         ALL REGEXES MUST HAVE THE TARGET ITEM IN THE FIRST CAPTURE GROUP (just use chatGPT)
 
         let regex_map: HashMap<&str, Regex> = [
-                ("test_regex", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()),
+                ("test_regex", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()), <--- Make sure to add the .unwrap() at the end of the regex
             ].iter().cloned().collect();
 
         The key is also used to display to the user what was found, so make it clear and concise, e.g., "email_address: Matched content."
@@ -258,33 +259,38 @@ impl  DataSurgeon {
     // }
 
     fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) -> () {
-        /* Searches through the specified regexes to determine if the data 
+        /* Searches through the specified regexes to determine if the data
         provided is valuable information for the provided user
         :param line: Line to process
         :param regex_map: Created regexes to search through
         */
-        if let Ok(line) = line { 
+        if let Ok(line) = line {
             let mut capture_set: HashSet<String> = HashSet::new();
             for (content_type, regex) in regex_map.iter() {
                 for capture in regex.captures_iter(&line) {
                     if let Some(capture_match) = capture.get(1) {
                         let filtered_capture: String = capture_match.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
-                        if !capture_set.insert(filtered_capture.clone()) {
-                            continue;
-                        }
-                        if self.clean {
-                            self.handle_message(&filtered_capture, &content_type);
-                        } else {
-                            self.handle_message(&line, &content_type);
-                        }
-                        if !self.thorough {
-                            return; 
+                        // Attempt to insert the captured item into the hashmap
+                        match capture_set.insert(filtered_capture.clone()) {
+                            // If we can't because the matched item was already found, move to the next
+                            false => continue,
+                            true => {
+                                if self.clean {
+                                    self.handle_message(&filtered_capture, &content_type);
+                                } else {
+                                    self.handle_message(&line, &content_type);
+                                }
+                                if !self.thorough {
+                                    return;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
+
 
 
     fn handle_message(&self, line: &String, content_type: &str) {
