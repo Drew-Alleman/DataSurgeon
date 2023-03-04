@@ -110,3 +110,5 @@ Command         | Speed          | Query Count
 
 # Project Goals
 * JSON and CSV output
+* Untar/unzip and a directorty searching mode
+* Base64 Detection and decoding
