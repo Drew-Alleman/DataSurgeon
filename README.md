@@ -1,4 +1,5 @@
 # DataSurgeon
+![preview](media/main.gif)
 DataSurgeon (ds) is a versatile tool designed for incident response, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, phone numbers, hashes, credit cards, URLs, IP addresses, MAC addresses, and SRV DNS records.
 
 # Quick Links
@@ -42,8 +43,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
 
 # Quick Install
-Installds 
-[Rust](https://www.rust-lang.org/tools/install) and [Github](https://desktop.github.com/)
+Install [Rust](https://www.rust-lang.org/tools/install) and [Github](https://desktop.github.com/)
 ### Linux
 ```
 wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | bash
