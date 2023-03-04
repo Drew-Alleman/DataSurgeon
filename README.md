@@ -3,14 +3,22 @@
 DataSurgeon (ds) is a versatile tool designed for incident response, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, phone numbers, hashes, credit cards, URLs, IP addresses, MAC addresses, SRV DNS records and a lot more!
 
 # Quick Links
-* [Extraction Features](#extraction-features)
+* [Features](#features)
 * [Quick Install](#quick-install)
 * [Command Line Arguments](#command-line-arguments)
 * [Examples](#examples)
 * [Speed Tests](#speed-tests)
 * [Project Goals](#project-goals)
 
-# Extraction Features
+# Features
+* Supports Windows, Linux and MacOS
+* Fast Proccessing Speeds
+* Accepts files
+* Can process standard input
+* Extracted information can be output to a secondary file
+
+
+## Extractable Information 
 * Emails
 * Files
 * Phone numbers
@@ -35,18 +43,18 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
 
 # Quick Install
-To install DataSurgeon, you need to install [Rust](https://www.rust-lang.org/tools/install) and [GitHub](https://desktop.github.com/).
+Install [Rust](https://www.rust-lang.org/tools/install) and [Github](https://desktop.github.com/)
 ### Linux
 ```
 wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | bash
 ```
 
 ### Windows 
-Run the following command in an elevated PowerShell window:
+Enter the line below in an elevated powershell window. 
 ```
 IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.ps1")
 ```
-After installing, restart your terminal, and you can use ```ds``` from the command line.
+Relaunch your terminal and you will be able to use ```ds``` from the command line.
 
 ### Mac
 ```
@@ -54,37 +62,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/Drew-Alle
 ```
 
 # Command Line Arguments
-```
-$ ds -h 
-Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.
-
-Usage: ds [OPTIONS]
-
-Options:
-  -f, --file <file>      File to extract information from
-  -C, --clean            Only displays the matched result, rather than the entire line
-  -T, --thorough         Doesn't stop at first match (useful for -C if multiple unique matches are on the same line
-  -D, --display           Displays the filename assoicated with the content found (https://github.com/Drew-Alleman/DataSurgeon#reading-all-files-in-a-directory)
-  -X, --hide             Hides the identifier string infront of the desired content (e.g: 'hash: ', 'url: ', 'email: ' will not be displayed.
-  -o, --output <output>  Output's the results of the procedure to a local file (recommended for large files)
-  -t, --time             Time how long the operation took
-  -e, --email            Extract email addresses
-  -p, --phone            Extracts phone numbers
-  -H, --hash             Extract hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4)
-  -i, --ip-addr          Extract IP addresses
-  -6, --ipv6-addr        Extract IPv6 addresses
-  -m, --mac-addr         Extract MAC addresses
-  -c, --credit-card      Extract credit card numbers
-  -u, --url              Extract urls
-  -F, --files            Extract filenames
-  -b, --bitcoin          Extract bitcoin wallets
-  -a, --aws              Extract AWS keys
-  -g, --google           Extract Google service account private key ids (used for google automations services)
-  -d, --dns              Extract Domain Name System records
-  -s, --social           Extract social security numbers
-  -h, --help             Print help
-  -V, --version          Print version                         
-```
+![help](media/help_preview.PNG)
 # Examples
 ## Extracting Files From a Remote Webiste
 Here I use ```wget``` to make a request to stackoverflow then I forward the body text to ```ds``` . The ```-F``` option will list all files found. ```--clean``` is used to remove any extra text that might have been returned (such as extra html). Then the result of is sent to ```uniq``` which removes any non unique files found.
@@ -94,7 +72,7 @@ Here I use ```wget``` to make a request to stackoverflow then I forward the body
 ![preview](media/wget_preview.gif)
 
 ## Extracting Mac Addresses From an Output File
-I am extracting all MAC addresses found in [autodeauth's](https://github.com/Drew-Alleman/autodeauth) log file using the ```-m``` query. To make the output cleaner, I'm using the ```--hide``` option to remove the identifier string 'mac_address: ' from the results. Additionally, I'm using the ```-T``` option to allow the tool to check the same line multiple times for matches. By default, the tool moves on to the next line after a match is found, but with ```-T``` it will keep searching for additional unique matches on the same line.
+Here I am pulling all mac addresses found in [autodeauth's](https://github.com/Drew-Alleman/autodeauth) log file using the ```-m``` query. The ```--hide``` option will hide the identifer string infront of the results. In this case 'mac_address: ' is hidden from the output. The ```-T``` option is used to check the same line multiple times for matches. Normallly when a match is found the tool moves on to the next line rather then checking again. 
 ```
 $ ./ds -m -T --hide -f /var/log/autodeauth/log     
 2023-02-26 00:28:19 - Sending 500 deauth frames to network: BC:2E:48:E5:DE:FF -- PrivateNetwork
@@ -102,7 +80,7 @@ $ ./ds -m -T --hide -f /var/log/autodeauth/log
 ```
 
 ## Reading all files in a directory
-The command below recursively reads all files in the current directory. Use the ```-D``` option to display the filename (requires ```-f``` to show the filename) and the ```-e``` option to search for email addresses.
+The line below will will read all files in the current directory recursively. The ```-D``` option is used to display the filename (-f is required for the filename to display) and -e used to search for emails.
 ```
 $ find . -type f -exec ds -f {} -CDe \;
 ```
