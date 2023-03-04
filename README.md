@@ -94,6 +94,9 @@ Options:
 # Examples
 ## Extracting Files From a Remote Webiste
 Here I use ```wget``` to make a request to stackoverflow then I forward the body text to ```ds``` . The ```-F``` option will list all files found. ```--clean``` is used to remove any extra text that might have been returned (such as extra html). Then the result of is sent to ```uniq``` which removes any non unique files found.
+```
+ wget -qO - https://www.stackoverflow.com | ds -F --clean | uniq
+```
 ![preview](media/wget_preview.gif)
 
 ## Extracting Mac Addresses From an Output File
