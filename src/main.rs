@@ -1,3 +1,6 @@
+/* https://github.com/Drew-Alleman/DataSurgeon
+Quickly Extracts IP's, Email Addresses, Hashes, Files, Credit Cards, Social Secuirty Numbers and more from text 
+*/ 
 use std::io;
 use clap::Arg;
 use regex::Regex;
@@ -26,7 +29,7 @@ impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.0")
+        .version("1.0.1")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -268,6 +271,12 @@ impl  DataSurgeon {
             let mut capture_set: HashSet<String> = HashSet::new();
             for (content_type, regex) in regex_map.iter() {
                 for capture in regex.captures_iter(&line) {
+                    if !self.clean {
+                        self.handle_message(&line, &content_type);
+                        if !self.thorough {
+                            return;
+                        }
+                    }
                     if let Some(capture_match) = capture.get(1) {
                         let filtered_capture: String = capture_match.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
                         // Attempt to insert the captured item into the hashmap
@@ -275,11 +284,7 @@ impl  DataSurgeon {
                             // If we can't because the matched item was already found, move to the next
                             false => continue,
                             true => {
-                                if self.clean {
-                                    self.handle_message(&filtered_capture, &content_type);
-                                } else {
-                                    self.handle_message(&line, &content_type);
-                                }
+                                self.handle_message(&filtered_capture, &content_type);
                                 if !self.thorough {
                                     return;
                                 }
@@ -290,7 +295,6 @@ impl  DataSurgeon {
             }
         }
     }
-
 
 
     fn handle_message(&self, line: &String, content_type: &str) {
