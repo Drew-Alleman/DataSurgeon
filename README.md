@@ -62,7 +62,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/Drew-Alle
 [![Video Title](https://img.youtube.com/vi/LAb6kBOWHwg/0.jpg)](https://www.youtube.com/watch?v=LAb6kBOWHwg)
 # Examples
 ## Extracting Files From a Remote Webiste
-Here I use ```wget``` to make a request to stackoverflow then I forward the body text to ```ds``` . The ```-F``` option will list all files found. ```--clean``` is used to remove any extra text that might have been returned (such as extra html). Then the result of is sent to ```uniq``` which removes any non unique files found.
+Here I use ```wget``` to make a request to stackoverflow then I forward the body text to ```ds``` . The ```-F``` option will list all files found. ```--clean``` is used to remove any extra text that might have been returned (such as extra html). Then the result of is sent to ```uniq``` which removes any non unique files found. Ig you wanted you can remove the warning message at the top 'Reading standard input..' by using -S.
 ```
  wget -qO - https://www.stackoverflow.com | ds -F --clean | uniq
 ```
