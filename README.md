@@ -10,6 +10,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 * [Command Line Arguments](#command-line-arguments)
 * [Examples](#examples)
 * [Speed Tests](#speed-tests)
+* [Recent Updates](#recent-updates)
 * [Project Goals](#project-goals)
 
 ## Extraction Features 
@@ -109,6 +110,10 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -t -6` | 00h:00m:12s | 1
 `cat test.txt \| ds -t -i -m` | 00h:00m:22 | 2
 `cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
+
+# Recent Updates 
+## 3/6/2023
+* Updated url and phone number regex to return less false positives.
 
 # Project Goals
 * JSON and CSV output
