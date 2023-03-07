@@ -29,7 +29,7 @@ impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.0.4")
+        .version("1.0.5")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -54,7 +54,13 @@ impl Default for DataSurgeon {
         .arg(Arg::new("display")
             .short('D')
             .long("display")
-            .help(" Displays the filename assoicated with the content found (https://github.com/Drew-Alleman/DataSurgeon#reading-all-files-in-a-directory)")
+            .help("Displays the filename assoicated with the content found (https://github.com/Drew-Alleman/DataSurgeon#reading-all-files-in-a-directory)")
+            .action(clap::ArgAction::SetTrue)
+        )
+        .arg(Arg::new("suppress")
+            .short('S')
+            .long("suppress")
+            .help("Suppress the 'Reading standard input' message when not providing a file")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("hide")
@@ -345,7 +351,9 @@ impl  DataSurgeon {
         /* Iterates through the standard input to find important informatio
         :param path: file to process
         */
-        println!("[*] Reading standard input. If you meant to analyze a file use 'ds -f <FILE>' (ctrl+c to exit)");
+        if !self.matches.get_one::<bool>("suppress").unwrap() {
+            println!("[*] Reading standard input. If you meant to analyze a file use 'ds -f <FILE>' (ctrl+c to exit)");
+        }
         let stdin = io::stdin();
         let reader = stdin.lock();
         let regex_map = self.build_regex_query();
