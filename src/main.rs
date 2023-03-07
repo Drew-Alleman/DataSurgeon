@@ -277,14 +277,14 @@ impl  DataSurgeon {
                             return;
                         }
                     }
-                    if let Some(capture_match) = capture.get(1) {
-                        let filtered_capture: String = capture_match.as_str().chars().filter(|c| !c.is_whitespace()).collect::<String>();
+                    if let Some(capture_match) = capture.get(0) {
+                        let filtered_capture = capture_match.as_str().clone().to_string();
                         // Attempt to insert the captured item into the hashmap
                         match capture_set.insert(filtered_capture.clone()) {
                             // If we can't because the matched item was already found, move to the next
                             false => continue,
                             true => {
-                                self.handle_message(&filtered_capture, &content_type);
+                                self.handle_message(&filtered_capture.clone(), &content_type);
                                 if !self.thorough {
                                     return;
                                 }
