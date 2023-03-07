@@ -211,7 +211,7 @@ impl  DataSurgeon {
             ("ip_address", Regex::new(r"\b((?:\d{1,3}\.){3}\d{1,3})\b").unwrap()),
             ("social_security", Regex::new(r"\b(\d{3}-\d{2}-\d{4})\b").unwrap()),
             ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
-            ("phone_number", Regex::new(r"\b(\d{3}[-.\s]?\d{3}[-.\s]?\d{4})\b").unwrap()),
+            ("phone_number", Regex::new(r"(\b[2-9]\d{2}-\d{3}-\d{4}\b)").unwrap()),
             ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
             ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
             ("google", Regex::new(r#""private_key_id":\s*"(\w{40})""#).unwrap()),
