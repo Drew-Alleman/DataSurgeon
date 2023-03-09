@@ -18,5 +18,5 @@ if (-not(Test-Path -Path "C:/ds/" -PathType Leaf)) {
   mkdir C:/ds/ | Out-Null
 }
 Write-Host "[*] Binding ds.exe to path (requires admin)"
-copy "$(Get-Location)\target\release\ds.exe" "C:/ds/ds.exe"
+copy "$(Get-Location)\target\release\ds.exe" $executablePath
 setx PATH "$env:PATH;C:/ds/"
