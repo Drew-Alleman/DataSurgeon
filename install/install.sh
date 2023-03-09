@@ -7,7 +7,11 @@ if [ -f "/usr/local/bin/ds" ]; then
     echo "[*] Removing old executable (password required)"
     sudo rm -rf /usr/local/bin/ds 2>&1
 fi
-git clone https://github.com/Drew-Alleman/DataSurgeon
+git clone https://github.com/Drew-Alleman/DataSurgeon --quiet
+if [ -d "DataSurgeon" ]; then
+    echo "[*] Failed to download the github repository"
+    exit
+fi
 cd DataSurgeon
 cargo build --release
 if [ -f "target/release/ds" ]; then
