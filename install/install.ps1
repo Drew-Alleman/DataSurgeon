@@ -6,9 +6,9 @@ if ((Test-Path -Path $executablePath -PathType Leaf)) {
   Remove-Item -Path $executablePath -Force -ErrorAction SilentlyContinue | Out-Null
 }
 
-if ((Test-Path -Path "DataSurgeon" -PathType Leaf)) {
+if ((Test-Path -Path ".\DataSurgeon" -PathType Container)) {
   Write-Host "[*] Removing the old 'DataSurgeon' directory"
-  Remove-Item -Path "DataSurgeon" -Force -ErrorAction SilentlyContinue | Out-Null
+  Remove-Item -Path "DataSurgeon" -Force -Recurse -ErrorAction SilentlyContinue | Out-Null
 }
 
 Write-Host "[*] Downloading DataSurgeon from Github..."
