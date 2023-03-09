@@ -24,3 +24,4 @@ if (!(Test-Path -Path $executableDirectory -PathType Container)) {
 Write-Host "[*] Binding ds.exe to path (requires admin)"
 copy "$(Get-Location)\target\release\ds.exe" $executablePath
 setx PATH "$env:PATH;$executableDirectory"
+cd ..
