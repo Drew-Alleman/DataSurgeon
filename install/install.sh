@@ -4,7 +4,7 @@ if [ -d "DataSurgeon" ]; then
     rm -rf DataSurgeon 2>&1
 fi
 if [ -f "/usr/local/bin/ds" ]; then
-    echo "[*] Removing old executable (password required)"
+    echo "[*] Removing old executable '/usr/local/bin/ds' (password required)"
     sudo rm -rf /usr/local/bin/ds 2>&1
 fi
 echo "[*] Downloading DataSurgeon's source from Github...."
