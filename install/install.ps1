@@ -10,7 +10,7 @@ if ((Test-Path -Path "DataSurgeon" -PathType Leaf)) {
   Remove-Item -Path "DataSurgeon" -Force -ErrorAction SilentlyContinue | Out-Null
 }
 Write-Host -Message "[*] Downloading DataSurgeon from Github..."
-git clone https://github.com/Drew-Alleman/DataSurgeon/ --quest
+git clone https://github.com/Drew-Alleman/DataSurgeon/ --quiet
 cd DataSurgeon
 cargo build --release 
 if (-not(Test-Path -Path "C:/ds/" -PathType Leaf)) {
