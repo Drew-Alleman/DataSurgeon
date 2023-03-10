@@ -30,7 +30,7 @@ impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.0.6")
+        .version("1.0.7")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -223,7 +223,7 @@ impl  DataSurgeon {
             ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
             ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
             ("google", Regex::new(r#""private_key_id":\s*"(\w{40})""#).unwrap()),
-            ("aws_keys", Regex::new(r"^(?i:ACCESS_KEY|aws_access_key_id|access_key|aws_secret_access_key|secret_key|aws_session_token)=(\S{20,})$").unwrap()),
+            ("aws_keys", Regex::new(r"\b(?:ACCESS_KEY|aws_access_key_id|aws_secret_access_key|secret_key)\s*=\s*([a-zA-Z0-9/+]{20,40})\s*\b").unwrap()),
             ("bitcoin_wallet", Regex::new(r"\b([13][a-km-zA-HJ-NP-Z1-9]{25,34})\b").unwrap()),
             // ("ssh_keys", Regex::new(r"(ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?)").unwrap())
             ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
