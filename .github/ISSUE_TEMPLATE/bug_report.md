@@ -14,6 +14,7 @@ If applicable, add screenshots to help explain your problem.
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
 
-**Additional context**
+**Additional context** 
+<br>
 What version are you on? ds -V
 Add any other context about the problem here.
