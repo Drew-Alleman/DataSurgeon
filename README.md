@@ -112,6 +112,8 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
 
 # Recent Updates 
+## 3/9/2023 | 1.0.6
+* Added support for CSV output (e.g ```ds -o output.csv -f test.txt```)
 ## 3/7/2023 | 1.0.5
 * Added -S / --suppress options to remove '[*] Reading standard input. If you meant to analyze a file use 'ds -f <FILE>' (ctrl+c to exit)' message
 ## 3/6/2023 | 1.0.4
