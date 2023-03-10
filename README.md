@@ -123,7 +123,6 @@ Command         | Speed          | Query Count
 * Updated url and phone number regex to return less false positives.
 
 # Project Goals
-* [Add Prompt to Installer](https://github.com/Drew-Alleman/DataSurgeon/issues/3)
 * JSON output
 * Untar/unzip and a directorty searching mode
 * Base64 Detection and decoding
