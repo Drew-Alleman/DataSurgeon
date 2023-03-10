@@ -124,6 +124,6 @@ Command         | Speed          | Query Count
 
 # Project Goals
 * [Add Prompt to Installer](https://github.com/Drew-Alleman/DataSurgeon/issues/3)
-* JSON and CSV output
+* JSON output
 * Untar/unzip and a directorty searching mode
 * Base64 Detection and decoding
