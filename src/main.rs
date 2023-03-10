@@ -22,6 +22,7 @@ struct DataSurgeon {
     thorough: bool,
     hide_type: bool,
     display: bool,
+    is_csv: bool,
 }
 
 
@@ -29,7 +30,7 @@ impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.0.5")
+        .version("1.0.6")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -179,6 +180,7 @@ impl Default for DataSurgeon {
             thorough: false,
             hide_type: false,
             display: false,
+            is_csv: false,
         }
     }
 }
@@ -251,6 +253,9 @@ impl  DataSurgeon {
     }
 
     fn write_to_file(&self, message: String) {
+        /* Writes content to the specified output file (-o)
+        :param message: Message to write
+        */
         let mut file = OpenOptions::new()
             .create(true)
             .append(true)
@@ -259,13 +264,6 @@ impl  DataSurgeon {
 
         writeln!(file, "{}", message).expect("Failed to write to output file");
     }
-
-    // fn to_row(&self) -> String {
-    //     /*
-    //     Converts the line to a CSV row
-    //     */
-    //     format!("{},{}", self.content_type, self.raw_line)
-    // }
 
     fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) -> () {
         /* Searches through the specified regexes to determine if the data
@@ -307,12 +305,23 @@ impl  DataSurgeon {
         /* Prints or Writes a message to the user
         :param message: Message to display or print
         */
-        let message = match (self.hide_type, self.display) {
+        let message: String;
+        if self.is_csv {
+            message = match (self.hide_type, self.display) {
+                (true, true) => format!("{}, {}", self.filename, line),
+                (true, false) => format!("{}", line),
+                (false, true) => format!("{}, {}, {}", content_type, self.filename, line),
+                (false, false) => format!("{}, {}", content_type, line),
+            };
+        } else {
+            message = match (self.hide_type, self.display) {
             (true, true) => format!("{}: {}", self.filename, line),
             (true, false) => format!("{}", line),
-            (false, true) => format!("{}, {}: {}", self.filename, content_type, line),
+            (false, true) => format!("{}, {}: {}",content_type, self.filename, line),
             (false, false) => format!("{}: {}", content_type, line),
-        };
+            };
+        }
+
         if self.is_output {
             self.write_to_file(message);
         } else {
@@ -325,12 +334,23 @@ impl  DataSurgeon {
         Used to build the attributes in the clap args
         */
         self.output_file = self.matches.get_one::<String>("output").unwrap_or(&String::new()).to_string().to_owned();
-        self.is_output =  !self.output_file.is_empty();
-        self.clean = *self.matches.get_one::<bool>("clean").clone().unwrap();
-        self.thorough =  *self.matches.get_one::<bool>("thorough").clone().unwrap();
-        self.hide_type = *self.matches.get_one::<bool>("hide").clone().unwrap();
-        self.display = *self.matches.get_one::<bool>("display").clone().unwrap();
+        self.is_output = !self.output_file.is_empty();
+        self.clean = *self.matches.get_one::<bool>("clean").unwrap_or(&false);
+        self.thorough = *self.matches.get_one::<bool>("thorough").unwrap_or(&false);
+        self.hide_type = *self.matches.get_one::<bool>("hide").unwrap_or(&false);
+        self.display = *self.matches.get_one::<bool>("display").unwrap_or(&false);
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
+        if self.is_output {
+            let parts = self.output_file.split(".");
+            let extension = parts.last().unwrap_or("");
+            match extension {
+                "csv" => {
+                    self.is_csv = true;
+                    self.create_headers();
+                },
+                _ => self.is_csv = false,
+            };
+        }
     }
 
 
@@ -345,6 +365,16 @@ impl  DataSurgeon {
             self.handle(&line, &regex_map);
         }
 
+    }
+
+    fn create_headers(&self) {
+        let message = match (self.hide_type, self.display) {
+            (true, true) => format!("file, data"),
+            (true, false) => format!("data"),
+            (false, true) => format!("content_type, file, data"),
+            (false, false) => format!("content_type, data"),
+        };
+        self.write_to_file(message)
     }
 
     fn iterate_stdin(&mut self) {
