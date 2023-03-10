@@ -15,6 +15,4 @@ If applicable, add screenshots to help explain your problem.
  - OS: [e.g. iOS]
 
 **Additional context** 
-<br>
-What version are you on? ds -V
-Add any other context about the problem here.
+What version are you on? ```ds -V```<br>
