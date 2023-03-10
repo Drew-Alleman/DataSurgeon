@@ -64,7 +64,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/Drew-Alle
 ## Extracting Files From a Remote Webiste
 Here I use ```wget``` to make a request to stackoverflow then I forward the body text to ```ds``` . The ```-F``` option will list all files found. ```--clean``` is used to remove any extra text that might have been returned (such as extra html). Then the result of is sent to ```uniq``` which removes any non unique files found. Ig you wanted you can remove the warning message at the top 'Reading standard input..' by using -S.
 ```
- wget -qO - https://www.stackoverflow.com | ds -F --clean | uniq
+$ wget -qO - https://www.stackoverflow.com | ds -F --clean | uniq
 ```
 ![preview](media/wget_preview.gif)
 
@@ -85,6 +85,9 @@ $ find . -type f -exec ds -f {} -CDe \;
 
 ## CSV Output
 To output your results to a CSV file, use the ```-o``` option followed by the name of the file you want to save your data to. The ```-D``` and ```-X``` are supported. The format is: ```ds -o <FILENAME>.csv``` (.csv is needed). 
+```
+ $ wget -qO - https://www.stackoverflow.com | ds -o output.csv -C
+```
 ![preview](media/csv_output.gif)
 
 
