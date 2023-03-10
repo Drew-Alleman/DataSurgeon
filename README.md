@@ -75,6 +75,9 @@ $ ./ds -m -T --hide -f /var/log/autodeauth/log
 2023-02-26 00:28:19 - Sending 500 deauth frames to network: BC:2E:48:E5:DE:FF -- PrivateNetwork
 2023-02-26 00:35:22 - Sending 500 deauth frames to network: 90:58:51:1C:C9:E1 -- TestNet
 ```
+## CSV Output
+To output your results to a CSV file, use the ```-o``` option followed by the name of the file you want to save your data to. The ```-D``` and ```-X``` are supported. The format is: ```ds -o <FILENAME>.csv``` (.csv is needed). 
+![preview](media/csv_output.gif)
 
 ## Reading all files in a directory
 The line below will will read all files in the current directory recursively. The ```-D``` option is used to display the filename (-f is required for the filename to display) and -e used to search for emails.
