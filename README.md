@@ -38,6 +38,9 @@ DataSurgeon (ds) is a versatile tool designed for incident response, penetration
 Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
 
 # Quick Install
+## Video Guide
+[![Guide](https://img.youtube.com/vi/_Sq8Qgndi4M/0.jpg)](https://www.youtube.com/watch?v=_Sq8Qgndi4M)
+
 Install [Rust](https://www.rust-lang.org/tools/install) and [Github](https://git-scm.com/downloads)
 ### Linux
 ```
