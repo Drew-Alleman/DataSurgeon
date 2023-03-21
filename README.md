@@ -123,7 +123,7 @@ Command         | Speed          | Query Count
 
 # Recent Updates
 ## 3/21/2023 | 1.0.9
-* Added ```--drop``` Specify a regular expression to exclude certain patterns from the search. (e.g --drop \"^.{1,10}$\" will hide all matches not under 10 characters)
+* Added ```--drop``` Specify a regular expression to exclude certain patterns from the search. (e.g ```ds -f text.txt --drop \"^.{1,10}$\"``` will hide all matches not under 10 characters)
 ## 3/10/2023 | 1.0.7
 * Updated the AWS regex (issue [here](https://github.com/Drew-Alleman/DataSurgeon/issues/4))
 ## 3/9/2023 | 1.0.6
