@@ -1,6 +1,6 @@
 /* https://github.com/Drew-Alleman/DataSurgeon
-Quickly Extracts IP's, Email Addresses, Hashes, Files, Credit Cards, Social Secuirty Numbers and more from text 
-*/ 
+Quickly Extracts IP's, Email Addresses, Hashes, Files, Credit Cards, Social Secuirty Numbers and more from text
+*/
 use std::io;
 use clap::Arg;
 use regex::Regex;
@@ -16,6 +16,8 @@ use std::collections::{HashSet, HashMap};
 struct DataSurgeon {
     matches: clap::ArgMatches,
     output_file: String,
+    drop: String,
+    drop_regex: Regex,
     filename: String,
     clean: bool,
     is_output: bool,
@@ -30,7 +32,7 @@ impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.0.7")
+        .version("1.0.9")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -63,12 +65,19 @@ impl Default for DataSurgeon {
             .long("suppress")
             .help("Suppress the 'Reading standard input' message when not providing a file")
             .action(clap::ArgAction::SetTrue)
+
+        )
+        .arg(Arg::new("drop")
+             .short('D')
+             .long("drop")
+             .help("Specify a regular expression to exclude certain patterns from the search. (e.g --drop \"^.{1,10}$\" will hide all matches not under 10 characters")
+             .action(clap::ArgAction::Set)
         )
         .arg(Arg::new("hide")
             .short('X')
             .long("hide")
             .help("Hides the identifier string infront of the desired content (e.g: 'hash: ', 'url: ', 'email: ' will not be displayed.")
-           .action(clap::ArgAction::SetTrue)         
+           .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("output")
             .short('o')
@@ -80,7 +89,7 @@ impl Default for DataSurgeon {
             .short('t')
             .long("time")
             .help("Time how long the operation took")
-            .action(clap::ArgAction::SetTrue) 
+            .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("email")
             .short('e')
@@ -98,7 +107,7 @@ impl Default for DataSurgeon {
             .short('H')
             .long("hash")
             .help("Extract hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4)")
-            .action(clap::ArgAction::SetTrue)       
+            .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("ip_address")
             .short('i')
@@ -176,6 +185,8 @@ impl Default for DataSurgeon {
             output_file: "".to_string(),
             filename: "".to_string(),
             clean: false,
+            drop: "".to_string(),
+            drop_regex: Regex::new(r#".{10,}"#).unwrap(),
             is_output: false,
             thorough: false,
             hide_type: false,
@@ -189,18 +200,18 @@ impl Default for DataSurgeon {
 impl  DataSurgeon {
 
     fn new() -> Self {
-        Self { 
-            ..Default::default() 
+        Self {
+            ..Default::default()
         }
     }
 
     fn build_regex_query(&self) -> HashMap<&'static str, Regex>{
-        /* Builds a regex query to search for important information 
-        :return: A HashMap containg the content type and the regex associated 
+        /* Builds a regex query to search for important information
+        :return: A HashMap containg the content type and the regex associated
 
-        Hello, Contributers! 
-        To add a new regex, add a new raw_line to the following line. 
-        The key is the name of the content you are searching for, 
+        Hello, Contributers!
+        To add a new regex, add a new raw_line to the following line.
+        The key is the name of the content you are searching for,
         and the value is the associated regex.
 
         ALL REGEXES MUST HAVE THE TARGET ITEM IN THE FIRST CAPTURE GROUP (just use chatGPT)
@@ -242,7 +253,7 @@ impl  DataSurgeon {
         let filtered_map: HashMap<&str, Regex> = keys
             .into_iter()
             .filter(|&key| {
-                let has_match = self.matches.get_one(key); 
+                let has_match = self.matches.get_one(key);
                 let is_empty = regex_map[key].as_str().is_empty();
                 *has_match.unwrap() && !is_empty
 
@@ -276,14 +287,20 @@ impl  DataSurgeon {
             for (content_type, regex) in regex_map.iter() {
                 for capture in regex.captures_iter(&line) {
                     if !self.clean {
+                        if !self.drop.is_empty() && self.drop_regex.is_match(&line) {
+                            continue;
+                        }
                         self.handle_message(&line, &content_type);
                         if !self.thorough {
                             return;
                         }
                     }
                     if let Some(capture_match) = capture.get(0) {
-                        let filtered_capture = capture_match.as_str().clone().to_string();
+                        let filtered_capture: String = capture_match.as_str().clone().to_string();
                         // Attempt to insert the captured item into the hashmap
+                        if !self.drop.is_empty() && self.drop_regex.is_match(&filtered_capture) {
+                            continue;
+                        }
                         match capture_set.insert(filtered_capture.clone()) {
                             // If we can't because the matched item was already found, move to the next
                             false => continue,
@@ -340,6 +357,10 @@ impl  DataSurgeon {
         self.hide_type = *self.matches.get_one::<bool>("hide").unwrap_or(&false);
         self.display = *self.matches.get_one::<bool>("display").unwrap_or(&false);
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
+        self.drop = self.matches.get_one::<String>("drop").unwrap_or(&String::new()).to_string().to_owned();
+        if !self.drop.is_empty() {
+            self.drop_regex = Regex::new(&self.drop).unwrap();
+        }
         if self.is_output {
             let parts = self.output_file.split(".");
             let extension = parts.last().unwrap_or("");
@@ -396,18 +417,17 @@ impl  DataSurgeon {
     fn display_time(&self, elapsed: f32) -> () {
         /* Displays how long the program took
         :param elapsed: Time in f32 that has elapsed.
-        */    
-        let hours = (elapsed / 3600.0) as u32;
-        let minutes = ((elapsed / 60.0) as u32) % 60;
-        let seconds = (elapsed as u32) % 60;
-        let hours12 = if hours == 0 { 0 } else if hours > 12 { hours - 12 } else { hours };
-        println!("Time elapsed: {:02}h:{:02}m:{:02}s", hours12, minutes, seconds);
+        */
+        let hours: u32 = (elapsed / 3600.0) as u32;
+        let minutes: u32 = ((elapsed / 60.0) as u32) % 60;
+        let seconds: u32 = (elapsed as u32) % 60;
+        println!("Time elapsed: {:02}h:{:02}m:{:02}s", hours, minutes, seconds);
     }
 
     fn process(&mut self) {
-        /* Searches for important information if the user specified a file othewise 
+        /* Searches for important information if the user specified a file othewise
         the standard output is iterated through
-        */    
+        */
         self.build_arguments();
         let start = Instant::now();
         if !self.filename.is_empty() {
