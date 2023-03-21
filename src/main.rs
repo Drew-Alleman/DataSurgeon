@@ -55,7 +55,6 @@ impl Default for DataSurgeon {
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("display")
-            .short('D')
             .long("display")
             .help("Displays the filename assoicated with the content found (https://github.com/Drew-Alleman/DataSurgeon#reading-all-files-in-a-directory)")
             .action(clap::ArgAction::SetTrue)
