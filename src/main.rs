@@ -70,7 +70,7 @@ impl Default for DataSurgeon {
         .arg(Arg::new("drop")
              .short('D')
              .long("drop")
-             .help("Specify a regular expression to exclude certain patterns from the search. (e.g --drop \"^.{1,10}$\" will hide all matches not under 10 characters")
+             .help("Specify a regular expression to exclude certain patterns from the search. (e.g --drop \"^.{1,10}$\" will hide all matches not under 10 characters)")
              .action(clap::ArgAction::Set)
         )
         .arg(Arg::new("hide")
