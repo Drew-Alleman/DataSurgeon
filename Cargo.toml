@@ -1,7 +1,12 @@
 [package]
 name = "ds"
-version = "1.0.7"
+version = "1.0.9"
 edition = "2021"
+authors = ["Drew Alleman"]
+repository = "https://github.com/Drew-Alleman/DataSurgeon/"
+license = "Apache 2.0"
+description = "Quickly Extracts IP's, Email Addresses, Hashes, Files, Credit Cards, Social Secuirty Numbers and More From Text"
+categories = ["osint", "email", "regex", "incident-response", "hacking", "ip-address", "rust-lang", "cybersecurity", "bug-bounty", "infosec", "pentesting", "recon", "ctf-tools", "file-search", "security-tools", "reconnaissance", "search-tools"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
