@@ -32,7 +32,7 @@ impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.0.9")
+        .version("1.1.0")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -294,17 +294,18 @@ impl  DataSurgeon {
                             return;
                         }
                     }
+                    // Fetch the first member of the capture group
                     if let Some(capture_match) = capture.get(0) {
-                        let filtered_capture: String = capture_match.as_str().clone().to_string();
-                        // Attempt to insert the captured item into the hashmap
+                        let filtered_capture: String = capture_match.as_str().to_string();
                         if !self.drop.is_empty() && self.drop_regex.is_match(&filtered_capture) {
                             continue;
                         }
+                        // Attempt to insert the captured item into the hashmap
                         match capture_set.insert(filtered_capture.clone()) {
-                            // If we can't because the matched item was already found, move to the next
+                            // If we can't because the matched item was already found, move to the next match
                             false => continue,
                             true => {
-                                self.handle_message(&filtered_capture.clone(), &content_type);
+                                self.handle_message(&filtered_capture.to_owned(), &content_type);
                                 if !self.thorough {
                                     return;
                                 }
