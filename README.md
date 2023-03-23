@@ -122,6 +122,8 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
 
 # Recent Updates
+## 3/23/2023 | 1.1.0
+Small Refactor
 ## 3/21/2023 | 1.0.9
 * Added ```--drop``` Specify a regular expression to exclude certain patterns from the search. (e.g ```ds -f text.txt --drop \"^.{1,10}$\"``` will hide all matches not under 10 characters)
 ## 3/10/2023 | 1.0.7
