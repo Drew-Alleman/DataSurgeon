@@ -21,14 +21,17 @@ We welcome the following types of contributions:
 3. Submit a pull request with your changes. 
 
 ## Adding a new Feature
+## If you Understand Regexe's and Basic Rust
 To contribute to our project, please follow these steps:
 1. Create a new issue describing the problem or feature you would like to work on.
 2. Fork the project repository and create a new branch for your changes.
 3. Make the changes to the code, following our coding standards and best practices.
 4. Compare your process speeds to the latest version on a 5GB test file
 5. Submit a pull request with your changes.
-
 We will review your changes as soon as possible and provide feedback if necessary.
+
+## If you dont
+Create a list of examples you want to be included and create an issue. 
 
 ## Code Guidelines
 
