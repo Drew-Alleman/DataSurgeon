@@ -21,7 +21,12 @@ if (!(Test-Path -Path $executableDirectory -PathType Container)) {
   mkdir C:/ds/ | Out-Null
 }
 
-Write-Host "[*] Binding ds.exe to path (requires admin)"
 copy "$(Get-Location)\target\release\ds.exe" $executablePath
-setx PATH "$env:PATH;$executableDirectory"
+RefreshEnv | Out-Null
+
+if ((Get-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Environment' -Name PATH -ErrorAction SilentlyContinue).Path -split ';' -notcontains $executableDirectory) {
+    Write-Host "[*] Binding ds.exe to user path (requires admin)"
+    setx PATH "$env:PATH;$executableDirectory"
+}
+
 cd ..
