@@ -61,7 +61,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/Drew-Alle
 ```
 
 # Command Line Arguments
-![help](media/help_preview.png)
+![help](media/help_preview.PNG)
 ## Video Guide
 [![Video Title](https://img.youtube.com/vi/LAb6kBOWHwg/0.jpg)](https://www.youtube.com/watch?v=LAb6kBOWHwg)
 # Examples
