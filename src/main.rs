@@ -17,6 +17,8 @@ struct DataSurgeon {
     matches: clap::ArgMatches,
     output_file: String,
     drop: String,
+    filter: String,
+    filter_regex: Regex,
     drop_regex: Regex,
     filename: String,
     clean: bool,
@@ -32,7 +34,7 @@ impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.1.0")
+        .version("1.1.1")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -70,6 +72,11 @@ impl Default for DataSurgeon {
         .arg(Arg::new("drop")
              .long("drop")
              .help("Specify a regular expression to exclude certain patterns from the search. (e.g --drop \"^.{1,10}$\" will hide all matches not under 10 characters)")
+             .action(clap::ArgAction::Set)
+        )
+        .arg(Arg::new("filter")
+             .long("filter")
+             .help("Include only lines that match the specified regex. (e.g: '--filter ^error' will only include lines that start with the word 'error'")
              .action(clap::ArgAction::Set)
         )
         .arg(Arg::new("hide")
@@ -185,7 +192,9 @@ impl Default for DataSurgeon {
             filename: "".to_string(),
             clean: false,
             drop: "".to_string(),
+            filter: "".to_string(),
             drop_regex: Regex::new(r#".{10,}"#).unwrap(),
+            filter_regex: Regex::new(r#".{10,}"#).unwrap(),
             is_output: false,
             thorough: false,
             hide_type: false,
@@ -275,6 +284,27 @@ impl  DataSurgeon {
         writeln!(file, "{}", message).expect("Failed to write to output file");
     }
 
+    fn is_worthy(&self, line: &str) -> bool {
+        /* This function is used to determine if a line should be printed
+        out or not. 
+        :return: True if the line should be displayed
+        */
+        // check if drop regex was set and there was a match
+        if !self.drop.is_empty() && self.drop_regex.is_match(line) {
+            return false;
+        }
+        // check if filter regex was set and there was no match
+        if !self.filter.is_empty() && self.filter_regex.is_match(line) {
+            return true;
+        }
+        // no filter regex is set
+        if self.filter.is_empty() {
+            return true;
+        }
+        // a filter regex was set but there was no match
+        return false;
+    }
+
     fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) -> () {
         /* Searches through the specified regexes to determine if the data
         provided is valuable information for the provided user
@@ -285,10 +315,7 @@ impl  DataSurgeon {
             let mut capture_set: HashSet<String> = HashSet::new();
             for (content_type, regex) in regex_map.iter() {
                 for capture in regex.captures_iter(&line) {
-                    if !self.clean {
-                        if !self.drop.is_empty() && self.drop_regex.is_match(&line) {
-                            continue;
-                        }
+                    if !self.clean && self.is_worthy(&line) {
                         self.handle_message(&line, &content_type);
                         if !self.thorough {
                             return;
@@ -297,7 +324,7 @@ impl  DataSurgeon {
                     // Fetch the first member of the capture group
                     if let Some(capture_match) = capture.get(0) {
                         let filtered_capture: String = capture_match.as_str().to_string();
-                        if !self.drop.is_empty() && self.drop_regex.is_match(&filtered_capture) {
+                        if !self.is_worthy(&filtered_capture) {
                             continue;
                         }
                         // Attempt to insert the captured item into the hashmap
@@ -358,8 +385,12 @@ impl  DataSurgeon {
         self.display = *self.matches.get_one::<bool>("display").unwrap_or(&false);
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
         self.drop = self.matches.get_one::<String>("drop").unwrap_or(&String::new()).to_string().to_owned();
+        self.filter = self.matches.get_one::<String>("filter").unwrap_or(&String::new()).to_string().to_owned();
         if !self.drop.is_empty() {
             self.drop_regex = Regex::new(&self.drop).unwrap();
+        }
+        if !self.filter.is_empty() {
+            self.filter_regex = Regex::new(&self.filter).unwrap();
         }
         if self.is_output {
             let parts = self.output_file.split(".");
@@ -374,6 +405,7 @@ impl  DataSurgeon {
         }
     }
 
+    
 
     fn iterate_file(&mut self) {
         /* Iterates through the specified file to find important information
