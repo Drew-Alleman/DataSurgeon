@@ -122,6 +122,8 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
 
 # Recent Updates
+### 4/25/2023 | (Windows Installer Update)
+After reinstalling DataSurgeon, the installation path "C:/ds/" was appended to the end of the user's environmental variable path, even if it was already installed. (Fixed)
 ## 3/23/2023 | 1.1.0
 Small Refactor
 ## 3/21/2023 | 1.0.9
