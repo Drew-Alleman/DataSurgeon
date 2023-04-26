@@ -7,6 +7,7 @@ use regex::Regex;
 use clap::Command;
 use std::vec::Vec;
 use std::path::Path;
+use walkdir::WalkDir;
 use std::time::Instant;
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
@@ -21,6 +22,7 @@ struct DataSurgeon {
     filter_regex: Regex,
     drop_regex: Regex,
     filename: String,
+    directory: String,
     clean: bool,
     is_output: bool,
     thorough: bool,
@@ -34,7 +36,7 @@ impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.1.1")
+        .version("1.1.2")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -49,6 +51,12 @@ impl Default for DataSurgeon {
             .long("clean")
             .help("Only displays the matched result, rather than the entire line")
             .action(clap::ArgAction::SetTrue)
+        )
+        .arg(
+            Arg::new("directory")
+            .long("directory")
+            .help("Process all files found in the specified directory")
+            .action(clap::ArgAction::Set)
         )
         .arg(Arg::new("thorough")
             .short('T')
@@ -193,6 +201,7 @@ impl Default for DataSurgeon {
             clean: false,
             drop: "".to_string(),
             filter: "".to_string(),
+            directory: "".to_string(),
             drop_regex: Regex::new(r#".{10,}"#).unwrap(),
             filter_regex: Regex::new(r#".{10,}"#).unwrap(),
             is_output: false,
@@ -384,6 +393,7 @@ impl  DataSurgeon {
         self.hide_type = *self.matches.get_one::<bool>("hide").unwrap_or(&false);
         self.display = *self.matches.get_one::<bool>("display").unwrap_or(&false);
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
+        self.directory = self.matches.get_one::<String>("directory").unwrap_or(&String::new()).to_string().to_owned();
         self.drop = self.matches.get_one::<String>("drop").unwrap_or(&String::new()).to_string().to_owned();
         self.filter = self.matches.get_one::<String>("filter").unwrap_or(&String::new()).to_string().to_owned();
         if !self.drop.is_empty() {
@@ -409,7 +419,6 @@ impl  DataSurgeon {
 
     fn iterate_file(&mut self) {
         /* Iterates through the specified file to find important information
-        :param path: file to process
         */
         let file = File::open(Path::new(self.filename.as_str())).unwrap();
         let reader = BufReader::new(file);
@@ -419,6 +428,31 @@ impl  DataSurgeon {
         }
 
     }
+
+    fn iterate_files(&mut self) {
+        /* Iterates through ALL files found in the specified directory "--directory" option 
+        */
+        let regex_map = self.build_regex_query();
+        for entry in WalkDir::new(self.directory.clone()).into_iter() {
+            match entry {
+                Ok(entry) if entry.file_type().is_file() => {
+                    let file = File::open(Path::new(entry.path()));
+                    self.filename = entry.path().display().to_string(); // We do this so if the -D (Display) option is used
+                    match file {                              // the proper filename is displayed
+                        Ok(file) => {
+                            let reader = BufReader::new(file);
+                            for line in reader.lines() {
+                                self.handle(&line, &regex_map);
+                            }
+                        },
+                        Err(_e) => continue,
+                        }
+                    }
+                    Err(_e) => continue,
+                    Ok(_) => continue,
+                }
+            };
+        }
 
     fn create_headers(&self) {
         let message = match (self.hide_type, self.display) {
@@ -464,6 +498,8 @@ impl  DataSurgeon {
         let start = Instant::now();
         if !self.filename.is_empty() {
             self.iterate_file();
+        } else if !self.directory.is_empty() {
+            self.iterate_files();
         } else {
             self.iterate_stdin();
         }
