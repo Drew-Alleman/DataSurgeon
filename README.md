@@ -80,9 +80,9 @@ $ ./ds -m -T --hide -f /var/log/autodeauth/log
 ```
 
 ## Reading all files in a directory
-The line below will will read all files in the current directory recursively. The ```-D``` option is used to display the filename (-f is required for the filename to display) and -e used to search for emails.
+The line below will will read all files in the current directory recursively by using the option ```--directory```. The ```-D``` option is used to display the filename.
 ```
-$ find . -type f -exec ds -f {} -CDe \;
+$ ds --directory test_dir/ -D
 ```
 ![preview](media/directory_search.gif)
 
@@ -124,7 +124,6 @@ Command         | Speed          | Query Count
 # Recent Updates
 ## 4/25/2023 | 1.1.2
 This update includes the addition of the dependency "walkdir". The directory option is used to process all files found in the specified directory you can still use the -D or --display option to show the file where the match was located.
-
 ## 4/25/2023 | 1.1.1
 Include only lines that match the specified regex. (e.g: '--filter ^error' will only include lines that start with the word 'error'
 ### 4/25/2023 | (Windows Installer Update)
