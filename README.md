@@ -80,7 +80,7 @@ $ ./ds -m -T --hide -f /var/log/autodeauth/log
 ```
 
 ## Reading all files in a directory
-The line below will will read all files in the current directory recursively by using the option ```--directory```. The ```-D``` option is used to display the filename.
+You can use the ```--directory``` option to read all files in the specified directory recursively. The ```-D``` option is used to display the filename where the match was found.
 ```
 $ ds --directory test_dir/ -D
 ```
