@@ -42,7 +42,8 @@ Please read the contributing guidelines [here](https://github.com/Drew-Alleman/D
 ## Video Guide
 [![Guide](https://img.youtube.com/vi/_Sq8Qgndi4M/0.jpg)](https://www.youtube.com/watch?v=_Sq8Qgndi4M)
 
-Install [Rust](https://www.rust-lang.org/tools/install) and [Github](https://git-scm.com/downloads)
+Install [Rust](https://www.rust-lang.org/tools/install) and [Github](https://git-scm.com/downloads) then RESTART YOUR TERMINAL.
+
 ### Linux
 ```
 wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | bash
