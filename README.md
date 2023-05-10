@@ -12,6 +12,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 * [Examples](#examples)
 * [Speed Tests](#speed-tests)
 * [Recent Updates](#recent-updates)
+* <b>[Reporting Issues](#reporting-issues)</b>
 * [Project Goals](#project-goals)
 
 ## Extraction Features 
@@ -134,6 +135,9 @@ After reinstalling DataSurgeon, the installation path "C:/ds/" was appended to t
 Small Refactor
 ## 3/21/2023 | 1.0.9
 * Added ```--drop``` Specify a regular expression to exclude certain patterns from the search. (e.g ```ds -f text.txt --drop \"^.{1,10}$\"``` will hide all matches not under 10 characters)
+
+# Reporting Issues
+When filling out a new issue please answer ALL questions on the  [bug template](https://github.com/Drew-Alleman/DataSurgeon/blob/main/.github/ISSUE_TEMPLATE/bug_report.md). Issues with not enough information will be closed. 
 
 # Project Goals
 * JSON output
