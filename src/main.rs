@@ -29,6 +29,7 @@ struct DataSurgeon {
     hide_type: bool,
     display: bool,
     is_csv: bool,
+    ignore: bool,
 }
 
 
@@ -36,7 +37,7 @@ impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.1.2")
+        .version("1.1.3")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -57,6 +58,12 @@ impl Default for DataSurgeon {
             .long("directory")
             .help("Process all files found in the specified directory")
             .action(clap::ArgAction::Set)
+        )
+        .arg(
+            Arg::new("ignore")
+            .long("ignore")
+            .help("Silences error messages")
+            .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("thorough")
             .short('T')
@@ -205,6 +212,7 @@ impl Default for DataSurgeon {
             drop_regex: Regex::new(r#".{10,}"#).unwrap(),
             filter_regex: Regex::new(r#".{10,}"#).unwrap(),
             is_output: false,
+            ignore: false,
             thorough: false,
             hide_type: false,
             display: false,
@@ -284,13 +292,37 @@ impl  DataSurgeon {
         /* Writes content to the specified output file (-o)
         :param message: Message to write
         */
-        let mut file = OpenOptions::new()
+        let mut file = match OpenOptions::new()
             .create(true)
             .append(true)
-            .open(&self.output_file)
-            .expect("Failed to open output file");
-
-        writeln!(file, "{}", message).expect("Failed to write to output file");
+            .open(&self.output_file) 
+        {
+            Ok(file) => file,
+            Err(error) => match error.kind() {
+                std::io::ErrorKind::NotFound => {
+                    // This should not happend
+                    self.print_error(format!("Failed to open output file: {}", error));
+                    std::process::exit(1);
+                }
+                std::io::ErrorKind::PermissionDenied => {
+                    self.print_error(format!("Permission denied for file: {}", error));
+                    std::process::exit(1);
+                }
+                _ => {
+                    self.print_error(format!("Failed to open output file: {}", error));
+                    std::process::exit(1);
+                }
+            },
+    };
+    
+        match writeln!(file, "{}", message) {
+            Ok(_) => {
+                // Write successful
+            },
+            Err(error) => {
+                println!("Failed to write to output file: {}", error);
+            }
+        }
     }
 
     fn is_worthy(&self, line: &str) -> bool {
@@ -314,7 +346,7 @@ impl  DataSurgeon {
         return false;
     }
 
-    fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) -> () {
+    fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) {
         /* Searches through the specified regexes to determine if the data
         provided is valuable information for the provided user
         :param line: Line to process
@@ -350,9 +382,12 @@ impl  DataSurgeon {
                     }
                 }
             }
+        } else {
+            if let Err(error) = line {
+                self.print_error(format!("Ran into error: {} when trying to read the file content", error));
+            }
         }
     }
-
 
     fn handle_message(&self, line: &String, content_type: &str) {
         /* Prints or Writes a message to the user
@@ -392,6 +427,7 @@ impl  DataSurgeon {
         self.thorough = *self.matches.get_one::<bool>("thorough").unwrap_or(&false);
         self.hide_type = *self.matches.get_one::<bool>("hide").unwrap_or(&false);
         self.display = *self.matches.get_one::<bool>("display").unwrap_or(&false);
+        self.ignore = *self.matches.get_one::<bool>("ignore").unwrap_or(&false);
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
         self.directory = self.matches.get_one::<String>("directory").unwrap_or(&String::new()).to_string().to_owned();
         self.drop = self.matches.get_one::<String>("drop").unwrap_or(&String::new()).to_string().to_owned();
@@ -403,15 +439,23 @@ impl  DataSurgeon {
             self.filter_regex = Regex::new(&self.filter).unwrap();
         }
         if self.is_output {
-            let parts = self.output_file.split(".");
-            let extension = parts.last().unwrap_or("");
-            match extension {
-                "csv" => {
-                    self.is_csv = true;
-                    self.create_headers();
-                },
-                _ => self.is_csv = false,
-            };
+            let parts: Vec<&str> = self.output_file.split(".").collect();
+            if parts.len() == 1 {
+                self.is_csv = false;
+            } else {
+                let extension = parts.last().unwrap_or(&"");
+                if extension.is_empty() {
+                    self.is_csv = false;
+                } else {
+                    match extension {
+                        &"csv" => {
+                            self.is_csv = true;
+                            self.create_headers();
+                        },
+                        _ => self.is_csv = false,
+                    }
+                }
+            }
         }
     }
 
@@ -420,13 +464,37 @@ impl  DataSurgeon {
     fn iterate_file(&mut self) {
         /* Iterates through the specified file to find important information
         */
-        let file = File::open(Path::new(self.filename.as_str())).unwrap();
-        let reader = BufReader::new(file);
-        let regex_map = self.build_regex_query();
-        for line in reader.lines() {
-            self.handle(&line, &regex_map);
+        match File::open(Path::new(&self.filename)) {
+            Ok(file) => {
+                let reader = BufReader::new(file);
+                let regex_map = self.build_regex_query();
+                for line in reader.lines() {
+                    self.handle(&line, &regex_map);
+                }
+            },
+            Err(error) => {
+                match error.kind() {
+                    std::io::ErrorKind::NotFound => {
+                        self.print_error(format!("File not found: {}", self.filename));
+                    },
+                    std::io::ErrorKind::PermissionDenied => {
+                        self.print_error(format!("Permission denied for file: {}", self.filename));
+                    },
+                    _ => {
+                        self.print_error(format!("Error opening file {}: {}", self.filename, error));
+                    }
+                }
+                std::process::exit(1);
+            }
         }
+    }
 
+    fn print_error(&self, message: String) -> () {
+        // Prints the error to the screen unless the "--ignore" option is enabled
+        // :param message: Message to print to the screen
+        if !self.ignore { 
+            println!("[-] {}", message);
+        }
     }
 
     fn iterate_files(&mut self) {
@@ -437,22 +505,35 @@ impl  DataSurgeon {
             match entry {
                 Ok(entry) if entry.file_type().is_file() => {
                     let file = File::open(Path::new(entry.path()));
-                    self.filename = entry.path().display().to_string(); // We do this so if the -D (Display) option is used
-                    match file {                              // the proper filename is displayed
+                    self.filename = entry.path().display().to_string();
+                    match file {
                         Ok(file) => {
                             let reader = BufReader::new(file);
                             for line in reader.lines() {
                                 self.handle(&line, &regex_map);
                             }
                         },
-                        Err(_e) => continue,
+                        Err(error) => {
+                            match error.kind() {
+                                std::io::ErrorKind::NotFound => {
+                                    self.print_error(format!("File not found: {}", entry.path().display()));
+                                },
+                                std::io::ErrorKind::PermissionDenied => {
+                                    self.print_error(format!("Permission denied for file: {}", entry.path().display()));
+                                },
+                                _ => {
+                                    self.print_error(format!("Error opening file {}: {}", entry.path().display(), error));
+                                }
+                            }
+                            continue; // Continue to the next iteration of the loop
                         }
                     }
-                    Err(_e) => continue,
-                    Ok(_) => continue,
                 }
-            };
+                _ => continue, // Continue to the next iteration of the loop
+            }
         }
+    }
+    
 
     fn create_headers(&self) {
         let message = match (self.hide_type, self.display) {
@@ -468,7 +549,7 @@ impl  DataSurgeon {
         /* Iterates through the standard input to find important informatio
         :param path: file to process
         */
-        if !self.matches.get_one::<bool>("suppress").unwrap() {
+        if !self.matches.get_one::<bool>("suppress").unwrap_or(&false) {
             println!("[*] Reading standard input. If you meant to analyze a file use 'ds -f <FILE>' (ctrl+c to exit)");
         }
         let stdin = io::stdin();
@@ -487,7 +568,7 @@ impl  DataSurgeon {
         let hours: u32 = (elapsed / 3600.0) as u32;
         let minutes: u32 = ((elapsed / 60.0) as u32) % 60;
         let seconds: u32 = (elapsed as u32) % 60;
-        println!("Time elapsed: {:02}h:{:02}m:{:02}s", hours, minutes, seconds);
+        println!("[*] Time elapsed: {:02}h:{:02}m:{:02}s", hours, minutes, seconds);
     }
 
     fn process(&mut self) {
