@@ -1,4 +1,4 @@
-# DataSurgeon v1.1.2
+# DataSurgeon v1.1.3
 ![preview](media/main.gif)
 DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, phone numbers, hashes, credit cards, URLs, IP addresses, MAC addresses, SRV DNS records and a lot more!
 
@@ -125,16 +125,14 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
 
 # Recent Updates
+## 5/24/2023 | 1.1.3
+Added a few custom error messages and the ```--ignore``` option which is used to ignore said messages that might be printed to the screen.
 ## 4/25/2023 | 1.1.2
 This update includes the addition of the dependency "walkdir". The directory option is used to process all files found in the specified directory you can still use the -D or --display option to show the file where the match was located.
 ## 4/25/2023 | 1.1.1
-Include only lines that match the specified regex. (e.g: '--filter ^error' will only include lines that start with the word 'error'
+Include only lines that match the specified regex. (e.g: ```--filter ^error``` will only include lines that start with the word 'error')
 ### 4/25/2023 | (Windows Installer Update)
 After reinstalling DataSurgeon, the installation path "C:/ds/" was appended to the end of the user's environmental variable path, even if it was already installed. (Fixed)
-## 3/23/2023 | 1.1.0
-Small Refactor
-## 3/21/2023 | 1.0.9
-* Added ```--drop``` Specify a regular expression to exclude certain patterns from the search. (e.g ```ds -f text.txt --drop \"^.{1,10}$\"``` will hide all matches not under 10 characters)
 
 # Reporting Issues
 When filling out a new issue please answer ALL questions on the  [bug template](https://github.com/Drew-Alleman/DataSurgeon/blob/main/.github/ISSUE_TEMPLATE/bug_report.md). Issues with not enough information will be closed. 
