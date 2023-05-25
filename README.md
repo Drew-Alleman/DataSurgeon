@@ -138,6 +138,7 @@ After reinstalling DataSurgeon, the installation path "C:/ds/" was appended to t
 When filling out a new issue please answer ALL questions on the  [bug template](https://github.com/Drew-Alleman/DataSurgeon/blob/main/.github/ISSUE_TEMPLATE/bug_report.md). Issues with not enough information will be closed. 
 
 # Project Goals
+* Line count
 * JSON output
 * Untar/unzip and a directorty searching mode
 * Base64 Detection and decoding
