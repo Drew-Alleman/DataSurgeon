@@ -1,4 +1,4 @@
-# DataSurgeon v1.1.3
+# DataSurgeon v1.1.4
 ![preview](media/main.gif)
 DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, phone numbers, hashes, credit cards, URLs, IP addresses, MAC addresses, SRV DNS records and a lot more!
 
@@ -125,6 +125,8 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
 
 # Recent Updates
+## 5/25/2023 | 1.1.4
+Added the ```--line``` or ```-l``` option which when enabled will show the line number the content was found on in the specified file/stream. 
 ## 5/24/2023 | 1.1.3
 Added a few custom error messages and the ```--ignore``` option which is used to ignore said messages that might be printed to the screen.
 ## 4/25/2023 | 1.1.2
