@@ -1,9 +1,11 @@
 
 ## Installation Issues
 1. What command are you using to install DataSurgeon?
+2. What Operating System are you on?
      * If on Windows are you in an elevated Powershell window?
-3. What Operating System are you on?
-4. What is the output of ```cargo -V``` <br>
+3. What is the output of ```cargo -V``` <br>
+
+
 Please provide a screenshot of the FULL output of running the installer.<br><br>
 
 ## DataSurgeon Bugs
