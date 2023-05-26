@@ -8,6 +8,7 @@ use clap::Command;
 use std::vec::Vec;
 use std::path::Path;
 use walkdir::WalkDir;
+use std::path::Display;
 use std::time::Instant;
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
@@ -24,20 +25,53 @@ struct DataSurgeon {
     filename: String,
     directory: String,
     clean: bool,
+    count: bool,
     is_output: bool,
     thorough: bool,
     hide_type: bool,
     display: bool,
     is_csv: bool,
     ignore: bool,
+    line_count: i32,
 }
 
+
+// fn yn_prompt(message: &str) -> bool {
+//     // Creates a Yes/No prompt with the provided message
+//     // 
+//     // # Arguments
+//     // * `&str` - Message to print with the prompt
+//     //
+//     // # Return
+//     // 
+//     // * `bool` - True if the user responded with Y or y otherwise False
+//     println!("[+] {}", message);
+
+//     let mut input = String::new();
+
+//     match io::stdin().read_line(&mut input) {
+//         Ok(_) => {
+//             match input.trim().to_lowercase().as_str() {
+//                 "y" => true,
+//                 "n" => false,
+//                 _ => {
+//                     println!("[-] Invalid input. Please enter 'y' or 'n'.");
+//                     yn_prompt(message) // Ask the prompt again for invalid input
+//                 }
+//             }
+//         }
+//         Err(error) => {
+//             println!("[-] Failed to read input: {}", error);
+//             false
+//         }
+//     }
+// }
 
 impl Default for DataSurgeon {
     fn default() -> Self {
         Self {
             matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.1.3")
+        .version("1.1.5")
         .author("https://github.com/Drew-Alleman/DataSurgeon")
         .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
@@ -63,6 +97,13 @@ impl Default for DataSurgeon {
             Arg::new("ignore")
             .long("ignore")
             .help("Silences error messages")
+            .action(clap::ArgAction::SetTrue)
+        )
+        .arg(
+            Arg::new("count")
+            .long("line")
+            .short('l')
+            .help("Displays the line number where the match occurred")
             .action(clap::ArgAction::SetTrue)
         )
         .arg(Arg::new("thorough")
@@ -217,6 +258,8 @@ impl Default for DataSurgeon {
             hide_type: false,
             display: false,
             is_csv: false,
+            count: false,
+            line_count: 0,
         }
     }
 }
@@ -231,23 +274,25 @@ impl  DataSurgeon {
     }
 
     fn build_regex_query(&self) -> HashMap<&'static str, Regex>{
-        /* Builds a regex query to search for important information
-        :return: A HashMap containg the content type and the regex associated
-
-        Hello, Contributers!
-        To add a new regex, add a new raw_line to the following line.
-        The key is the name of the content you are searching for,
-        and the value is the associated regex.
-
-        ALL REGEXES MUST HAVE THE TARGET ITEM IN THE FIRST CAPTURE GROUP (just use chatGPT)
-
-        let regex_map: HashMap<&str, Regex> = [
-                ("test_regex", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()), <--- Make sure to add the .unwrap() at the end of the regex
-            ].iter().cloned().collect();
-
-        The key is also used to display to the user what was found, so make it clear and concise, e.g., "email_address: Matched content."
-        Note that the regex patterns must conform to Rust's regex syntax. You can test your regex patterns at https://regexr.com/.
-        */
+        // Builds a regex query to search for important information
+        //
+        // # Return
+        //
+        // * `HashMap<&'static str, Regex>` - A HashMap containg the content type and the regex associated
+        //
+        // Hello, Contributers!
+        // To add a new regex, add a new raw_line to the following line.
+        // The key is the name of the content you are searching for,
+        // and the value is the associated regex.
+        // 
+        // ALL REGEXES MUST HAVE THE TARGET ITEM IN THE FIRST CAPTURE GROUP (just use chatGPT)
+        // 
+        // let regex_map: HashMap<&str, Regex> = [
+        //  ("test_regex", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()), <--- Make sure to add the .unwrap() at the end of the regex
+        //  ].iter().cloned().collect();
+        // 
+        // The key is also used to display to the user what was found, so make it clear and concise, e.g., "email_address: Matched content."
+        // Note that the regex patterns must conform to Rust's regex syntax. You can test your regex patterns at https://regexr.com/.
         let regex_map: HashMap<&str, Regex> = [
             ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
             ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
@@ -288,10 +333,12 @@ impl  DataSurgeon {
         filtered_map
     }
 
-    fn write_to_file(&self, message: String) {
-        /* Writes content to the specified output file (-o)
-        :param message: Message to write
-        */
+    fn write_to_file(&self, message: &str) -> () {
+        // Writes content to the specified output file (-o option)
+        //  
+        // # Arguments
+        //
+        // * `&str` - Message to write to the output file
         let mut file = match OpenOptions::new()
             .create(true)
             .append(true)
@@ -300,36 +347,48 @@ impl  DataSurgeon {
             Ok(file) => file,
             Err(error) => match error.kind() {
                 std::io::ErrorKind::NotFound => {
-                    // This should not happend
-                    self.print_error(format!("Failed to open output file: {}", error));
+                    // This should not happen
+                    self.print_error(format!("Failed to open output file: {}", self.filename));
                     std::process::exit(1);
                 }
                 std::io::ErrorKind::PermissionDenied => {
-                    self.print_error(format!("Permission denied for file: {}", error));
+                    self.print_error(format!("Permission denied for file: {}", self.filename));
                     std::process::exit(1);
                 }
                 _ => {
-                    self.print_error(format!("Failed to open output file: {}", error));
+                    self.print_error(format!("Failed to open output file: {}. Error: {}", self.filename, error));
                     std::process::exit(1);
                 }
             },
-    };
+        };
     
         match writeln!(file, "{}", message) {
             Ok(_) => {
                 // Write successful
             },
-            Err(error) => {
-                println!("Failed to write to output file: {}", error);
+            Err(error) => match error.kind() {
+                std::io::ErrorKind::PermissionDenied => {
+                    println!("Permission denied while writing to output file: {}", self.filename);
+                    std::process::exit(1);
+                }
+                std::io::ErrorKind::WriteZero => {
+                    self.print_error(format!("Disk is full, unable to write to output file: {}", self.filename));
+                    std::process::exit(1);
+                }
+                _ => {
+                    println!("Failed to write to output file: {} error: {}", self.filename, error);
+                }
             }
         }
     }
 
     fn is_worthy(&self, line: &str) -> bool {
-        /* This function is used to determine if a line should be printed
-        out or not. 
-        :return: True if the line should be displayed
-        */
+        // This function is used to determine if a line should be printed
+        // out or not. 
+        //
+        // # Return
+        //
+        // * `bool` - True if the line should be displayed
         // check if drop regex was set and there was a match
         if !self.drop.is_empty() && self.drop_regex.is_match(line) {
             return false;
@@ -346,13 +405,16 @@ impl  DataSurgeon {
         return false;
     }
 
-    fn handle(&self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) {
-        /* Searches through the specified regexes to determine if the data
-        provided is valuable information for the provided user
-        :param line: Line to process
-        :param regex_map: Created regexes to search through
-        */
+    fn handle(&mut self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) {
+        // Searches through the specified regexes to determine if the data
+        // provided is valuable information for the provided user
+        //
+        // # Arguments
+        //
+        // * `&std::io::Result<String>` - Line to process
+        // * `regex_map`                - Created regexes to search through
         if let Ok(line) = line {
+            self.line_count += 1;
             let mut capture_set: HashSet<String> = HashSet::new();
             for (content_type, regex) in regex_map.iter() {
                 for capture in regex.captures_iter(&line) {
@@ -383,47 +445,58 @@ impl  DataSurgeon {
                 }
             }
         } else {
-            if let Err(error) = line {
-                self.print_error(format!("Ran into error: {} when trying to read the file content", error));
+            // Annoying
+            // if let Err(error) = line {
+            //     self.print_error(format!("Ran into error: {} when trying to read the line {} in {}", error, self.line_count, self.filename));
+            // }
+        }
+    }
+
+    fn handle_message(&self, line: &String, content_type: &str) -> () {
+        // Handles the specifed line and either writes or prints it to the
+        // screen
+        //
+        // # Arguments
+        // 
+        // * `&String` - The line that had intresting content on it
+        // * `&str`    - The content that was matched to the line
+        let message = if self.is_csv {
+            match (self.hide_type, self.display, self.count) {
+                (true, true, true) => format!("{}, {}, {}", self.filename, self.line_count, line),
+                (true, true, false) => format!("{}, {}", self.filename, line),
+                (true, false, true) => format!("{}, {}", self.line_count, line),
+                (true, false, false) => format!("{}", line),
+                (false, true, true) => format!("{}, {}, {}, {}", content_type, self.filename, self.line_count, line),
+                (false, true, false) => format!("{}, {}, {}", content_type, self.filename, line),
+                (false, false, true) => format!("{}, {}, {}", content_type, self.line_count, line),
+                (false, false, false) => format!("{}, {}", content_type, line),
             }
-        }
-    }
-
-    fn handle_message(&self, line: &String, content_type: &str) {
-        /* Prints or Writes a message to the user
-        :param message: Message to display or print
-        */
-        let message: String;
-        if self.is_csv {
-            message = match (self.hide_type, self.display) {
-                (true, true) => format!("{}, {}", self.filename, line),
-                (true, false) => format!("{}", line),
-                (false, true) => format!("{}, {}, {}", content_type, self.filename, line),
-                (false, false) => format!("{}, {}", content_type, line),
-            };
         } else {
-            message = match (self.hide_type, self.display) {
-            (true, true) => format!("{}: {}", self.filename, line),
-            (true, false) => format!("{}", line),
-            (false, true) => format!("{}, {}: {}",content_type, self.filename, line),
-            (false, false) => format!("{}: {}", content_type, line),
-            };
-        }
-
+            match (self.hide_type, self.display, self.count) {
+                (true, true, true) => format!("file: {} {}, line: {}", self.filename, line, self.line_count),
+                (true, true, false) => format!("file: {} {}", self.filename, line),
+                (true, false, true) => format!("{}, line: {}", line, self.line_count),
+                (true, false, false) => format!("{}", line),
+                (false, true, true) => format!("{}, file: {} {}, line: {}", content_type, self.filename, line, self.line_count),
+                (false, true, false) => format!("{}, file: {} {}", content_type, self.filename, line),
+                (false, false, true) => format!("{}, {}, line: {}", content_type, line, self.line_count),
+                (false, false, false) => format!("{}: {}", content_type, line),
+            }
+        };
+        
         if self.is_output {
-            self.write_to_file(message);
+            self.write_to_file(&message);
         } else {
-            writeln!(std::io::stdout(), "{}", message).unwrap();
+            println!("{}", message);
         }
     }
 
-    fn build_arguments(&mut self) {
-        /*
-        Used to build the attributes in the clap args
-        */
+    fn build_arguments(&mut self) -> () {
+        // Used to build the attributes in the clap args
         self.output_file = self.matches.get_one::<String>("output").unwrap_or(&String::new()).to_string().to_owned();
         self.is_output = !self.output_file.is_empty();
         self.clean = *self.matches.get_one::<bool>("clean").unwrap_or(&false);
+        self.count = *self.matches.get_one::<bool>("count").unwrap_or(&false);
         self.thorough = *self.matches.get_one::<bool>("thorough").unwrap_or(&false);
         self.hide_type = *self.matches.get_one::<bool>("hide").unwrap_or(&false);
         self.display = *self.matches.get_one::<bool>("display").unwrap_or(&false);
@@ -461,9 +534,8 @@ impl  DataSurgeon {
 
     
 
-    fn iterate_file(&mut self) {
-        /* Iterates through the specified file to find important information
-        */
+    fn iterate_file(&mut self) -> () {
+        // Iterates through the specified file to find important information
         match File::open(Path::new(&self.filename)) {
             Ok(file) => {
                 let reader = BufReader::new(file);
@@ -481,7 +553,7 @@ impl  DataSurgeon {
                         self.print_error(format!("Permission denied for file: {}", self.filename));
                     },
                     _ => {
-                        self.print_error(format!("Error opening file {}: {}", self.filename, error));
+                        self.print_error(format!("Error opening file: {}. Error: {}", self.filename, error));
                     }
                 }
                 std::process::exit(1);
@@ -491,20 +563,23 @@ impl  DataSurgeon {
 
     fn print_error(&self, message: String) -> () {
         // Prints the error to the screen unless the "--ignore" option is enabled
-        // :param message: Message to print to the screen
+        // 
+        // # Arguments
+        //
+        // * `String` -  Message to print to the screen
         if !self.ignore { 
             println!("[-] {}", message);
         }
     }
 
-    fn iterate_files(&mut self) {
-        /* Iterates through ALL files found in the specified directory "--directory" option 
-        */
+    fn iterate_files(&mut self) -> () {
+        // Iterates through ALL files found in the specified directory "--directory" option 
         let regex_map = self.build_regex_query();
         for entry in WalkDir::new(self.directory.clone()).into_iter() {
             match entry {
                 Ok(entry) if entry.file_type().is_file() => {
                     let file = File::open(Path::new(entry.path()));
+                    self.line_count = 0;
                     self.filename = entry.path().display().to_string();
                     match file {
                         Ok(file) => {
@@ -514,15 +589,16 @@ impl  DataSurgeon {
                             }
                         },
                         Err(error) => {
+                            let filename: Display = entry.path().display();
                             match error.kind() {
                                 std::io::ErrorKind::NotFound => {
-                                    self.print_error(format!("File not found: {}", entry.path().display()));
+                                    self.print_error(format!("File not found: {}", filename));
                                 },
                                 std::io::ErrorKind::PermissionDenied => {
-                                    self.print_error(format!("Permission denied for file: {}", entry.path().display()));
+                                    self.print_error(format!("Permission denied for file: {}", filename));
                                 },
                                 _ => {
-                                    self.print_error(format!("Error opening file {}: {}", entry.path().display(), error));
+                                    self.print_error(format!("Error opening file {}: {}", filename, error));
                                 }
                             }
                             continue; // Continue to the next iteration of the loop
@@ -535,20 +611,25 @@ impl  DataSurgeon {
     }
     
 
-    fn create_headers(&self) {
-        let message = match (self.hide_type, self.display) {
-            (true, true) => format!("file, data"),
-            (true, false) => format!("data"),
-            (false, true) => format!("content_type, file, data"),
-            (false, false) => format!("content_type, data"),
+    
+
+    fn create_headers(&self) -> () {
+        // Creates the headers for the outputted CSV file
+        let message = match (self.hide_type, self.display, self.count) {
+            (true, true, true) => format!("file, line, data"),
+            (true, true, false) => format!("file, data"),
+            (true, false, true) => format!("line, data"),
+            (true, false, false) => format!("data"),
+            (false, true, true) => format!("content_type, file, line, data"),
+            (false, true, false) => format!("content_type, file, data"),
+            (false, false, true) => format!("content_type, line, data"),
+            (false, false, false) => format!("content_type, data"),
         };
-        self.write_to_file(message)
+        self.write_to_file(&message);
     }
 
-    fn iterate_stdin(&mut self) {
-        /* Iterates through the standard input to find important informatio
-        :param path: file to process
-        */
+    fn iterate_stdin(&mut self) -> () {
+        // Iterates through the standard input to find important informatio
         if !self.matches.get_one::<bool>("suppress").unwrap_or(&false) {
             println!("[*] Reading standard input. If you meant to analyze a file use 'ds -f <FILE>' (ctrl+c to exit)");
         }
@@ -562,19 +643,20 @@ impl  DataSurgeon {
     }
 
     fn display_time(&self, elapsed: f32) -> () {
-        /* Displays how long the program took
-        :param elapsed: Time in f32 that has elapsed.
-        */
+        // Displays how long the program took
+        //
+        // # Arguments
+        //
+        // * `f32` - Time that has elapsed
         let hours: u32 = (elapsed / 3600.0) as u32;
         let minutes: u32 = ((elapsed / 60.0) as u32) % 60;
         let seconds: u32 = (elapsed as u32) % 60;
         println!("[*] Time elapsed: {:02}h:{:02}m:{:02}s", hours, minutes, seconds);
     }
 
-    fn process(&mut self) {
-        /* Searches for important information if the user specified a file othewise
-        the standard output is iterated through
-        */
+    fn process(&mut self) -> () {
+        // Searches for important information if the user specified a file othewise
+        // the standard output is iterated through
         self.build_arguments();
         let start = Instant::now();
         if !self.filename.is_empty() {
