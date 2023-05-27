@@ -4,6 +4,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 
 * Supports Windows, Linux and MacOS
 * Support recursive file analysis within directories
+* CSV Output
 
 # Quick Links
 * [Extraction Features](#extraction-features )
