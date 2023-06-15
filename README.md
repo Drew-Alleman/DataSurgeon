@@ -41,6 +41,8 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
 
 # Quick Install
+The quick installer can also be used to update DataSurgeon. 
+
 ## Video Guide
 [![Guide](https://img.youtube.com/vi/_Sq8Qgndi4M/0.jpg)](https://www.youtube.com/watch?v=_Sq8Qgndi4M)
 
