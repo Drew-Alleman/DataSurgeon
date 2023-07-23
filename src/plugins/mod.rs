@@ -64,16 +64,21 @@ pub struct RegexPlugin {
 //
 // * `Result<Vec<RegexPlugin>, Box<dyn std::error::Error>>` - Returns a `Result` which is an `Ok` of a vector of `RegexPlugin` objects if the plugins are fetched and parsed successfully, or an `Err` of a dynamic error if there is any error in fetching or parsing the plugins.
 pub fn get_plugins_from_url(url: &str) -> Result<Vec<RegexPlugin>, Box<dyn std::error::Error>> {
-    let resp = reqwest::blocking::get(url)?;
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; MAGWJS; rv:11.0) like Gecko")
+        .build()?;
+
+    let resp = client.get(url).send()?;
+    
     if !resp.status().is_success() {
         println!("Error: Received a {} status code from the server.", resp.status());
         std::process::exit(1);
     }
+
     let body = resp.text()?;
     let plugins: Vec<RegexPlugin> = serde_json::from_str(&body)?;
     Ok(plugins)
 }
-
 
 
 // This function tries to find a plugins.json file at certain paths.
