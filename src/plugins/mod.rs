@@ -178,8 +178,8 @@ pub fn add_plugin_from_url(url: &str) -> bool {
             }
             plugins
         },
-        _ => {
-            println!("[-] Error: Failed to parse plugins.json from the provided URL.");
+        Err(e) => {
+            eprintln!("[-] Error: Failed to parse plugins.json from the provided URL. Reason: {}", e);
             std::process::exit(1);
         }
     };
