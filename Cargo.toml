@@ -1,6 +1,6 @@
 [package]
 name = "ds"
-version = "1.1.4"
+version = "1.2.0"
 edition = "2021"
 authors = ["Drew Alleman"]
 repository = "https://github.com/Drew-Alleman/DataSurgeon/"
@@ -14,4 +14,7 @@ categories = ["osint", "email", "regex", "incident-response", "hacking", "ip-add
 regex = "1.7.1"
 clap = "4.1.8"
 walkdir = "2.3.3"
+serde_json = "1.0.103"
+serde = { version="1.0.174" , features = ["derive"] }
+reqwest = { version="0.11.18" , features = ["blocking"] }
 
