@@ -1,15 +1,20 @@
 /* https://github.com/Drew-Alleman/DataSurgeon
 Quickly Extracts IP's, Email Addresses, Hashes, Files, Credit Cards, Social Secuirty Numbers and more from text
 */
+
+mod utils;
+mod plugins;
+
+use crate::plugins::{RegexPlugin, list_plugins, remove_plugins_from_url, load_plugins, add_plugin_from_url};
+
 use std::io;
 use clap::Arg;
 use regex::Regex;
 use clap::Command;
 use std::vec::Vec;
-use std::path::Path;
 use walkdir::WalkDir;
-use std::path::Display;
 use std::time::Instant;
+use std::path::{Path, Display};
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::collections::{HashSet, HashMap};
@@ -17,6 +22,7 @@ use std::collections::{HashSet, HashMap};
 
 struct DataSurgeon {
     matches: clap::ArgMatches,
+    plugins: Vec<RegexPlugin>,
     output_file: String,
     drop: String,
     filter: String,
@@ -35,50 +41,33 @@ struct DataSurgeon {
     line_count: i32,
 }
 
-
-// fn yn_prompt(message: &str) -> bool {
-//     // Creates a Yes/No prompt with the provided message
-//     // 
-//     // # Arguments
-//     // * `&str` - Message to print with the prompt
-//     //
-//     // # Return
-//     // 
-//     // * `bool` - True if the user responded with Y or y otherwise False
-//     println!("[+] {}", message);
-
-//     let mut input = String::new();
-
-//     match io::stdin().read_line(&mut input) {
-//         Ok(_) => {
-//             match input.trim().to_lowercase().as_str() {
-//                 "y" => true,
-//                 "n" => false,
-//                 _ => {
-//                     println!("[-] Invalid input. Please enter 'y' or 'n'.");
-//                     yn_prompt(message) // Ask the prompt again for invalid input
-//                 }
-//             }
-//         }
-//         Err(error) => {
-//             println!("[-] Failed to read input: {}", error);
-//             false
-//         }
-//     }
-// }
-
 impl Default for DataSurgeon {
     fn default() -> Self {
-        Self {
-            matches: Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
-        .version("1.1.4")
-        .author("https://github.com/Drew-Alleman/DataSurgeon")
-        .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
+        let plugins = load_plugins();
+        let mut app = Command::new("DataSurgeon: https://github.com/Drew-Alleman/DataSurgeon")
+            .version("1.2.0")
+            .author("https://github.com/Drew-Alleman/DataSurgeon")
+            .about("Note: All extraction features (e.g: -i) work on a specified file (-f) or an output stream.")
         .arg(Arg::new("file")
             .short('f')
             .long("file")
             .help("File to extract information from")
             .action(clap::ArgAction::Set)
+        )
+        .arg(Arg::new("add")
+            .long("add")
+            .help("Adds a plugin from a GitHub repository (e.g ds --add https://github.com/Drew-Alleman/ds-winreg-plugin/)")
+            .action(clap::ArgAction::Set)
+        )
+        .arg(Arg::new("remove")
+            .long("remove")
+            .help("Removes a plugin from a GitHub repository (e.g ds --remove https://github.com/Drew-Alleman/ds-winreg-plugin/)")
+            .action(clap::ArgAction::Set)
+        )
+        .arg(Arg::new("list")
+            .long("list")
+            .help("List all added plugins")
+            .action(clap::ArgAction::SetTrue)
         )
         .arg(
             Arg::new("clean")
@@ -225,12 +214,6 @@ impl Default for DataSurgeon {
             .help("Extract Google service account private key ids (used for google automations services)")
             .action(clap::ArgAction::SetTrue)
         )
-        // .arg(Arg::new("ssh_keys")
-        //     .short('S')
-        //     .long("ssh")
-        //     .help("Extract ssh keys")
-        //     .action(clap::ArgAction::SetTrue)
-        // )
         .arg(Arg::new("srv_dns")
             .short('d')
             .long("dns")
@@ -242,8 +225,27 @@ impl Default for DataSurgeon {
             .long("social")
             .help("Extract social security numbers")
             .action(clap::ArgAction::SetTrue)
-        )
-        .get_matches(),
+        );
+        let args: Vec<_> = plugins
+            .iter()
+            .map(|plugin| (plugin.content_type.clone(), plugin.arg_long_name.clone(), plugin.help_message.clone()))
+            .collect();
+
+        for (content_type, arg_long_name, help_message) in args {
+            let content_type = Box::leak(content_type.into_boxed_str());
+            let arg_long_name = Box::leak(arg_long_name.into_boxed_str());
+            let help_message = Box::leak(help_message.into_boxed_str());
+        
+            let arg = Arg::new(&*content_type)
+                .long(&*arg_long_name)
+                .help(&*help_message)
+                .action(clap::ArgAction::SetTrue);
+            app = app.arg(arg);
+        }
+        let matches = app.get_matches();
+        Self {
+            matches,
+            plugins: plugins,
             output_file: "".to_string(),
             filename: "".to_string(),
             clean: false,
@@ -265,6 +267,7 @@ impl Default for DataSurgeon {
 }
 
 
+
 impl  DataSurgeon {
 
     fn new() -> Self {
@@ -273,27 +276,13 @@ impl  DataSurgeon {
         }
     }
 
-    fn build_regex_query(&self) -> HashMap<&'static str, Regex>{
-        // Builds a regex query to search for important information
-        //
-        // # Return
-        //
-        // * `HashMap<&'static str, Regex>` - A HashMap containg the content type and the regex associated
-        //
-        // Hello, Contributers!
-        // To add a new regex, add a new raw_line to the following line.
-        // The key is the name of the content you are searching for,
-        // and the value is the associated regex.
-        // 
-        // ALL REGEXES MUST HAVE THE TARGET ITEM IN THE FIRST CAPTURE GROUP (just use chatGPT)
-        // 
-        // let regex_map: HashMap<&str, Regex> = [
-        //  ("test_regex", Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap()), <--- Make sure to add the .unwrap() at the end of the regex
-        //  ].iter().cloned().collect();
-        // 
-        // The key is also used to display to the user what was found, so make it clear and concise, e.g., "email_address: Matched content."
-        // Note that the regex patterns must conform to Rust's regex syntax. You can test your regex patterns at https://regexr.com/.
-        let regex_map: HashMap<&str, Regex> = [
+    // Builds a regex query to search for important information
+    //
+    // # Return
+    //
+    // * `HashMap<&'static str, Regex>` - A HashMap containg the content type and the regex associated
+    fn build_regex_query(&self) -> HashMap<String, Regex>{
+        let mut regex_map: HashMap<String, Regex> = [
             ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
             ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
             ("url", Regex::new(r#"(https?://(?:[^\s.,;:"'<>()\[\]{}]+\.)*[^\s.,;:"'<>()\[\]{}]+(/[^\s]*[^\s.,;:"'<>()\[\]{}\s])?)"#).unwrap()),
@@ -309,36 +298,40 @@ impl  DataSurgeon {
             // ("ssh_keys", Regex::new(r"(ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?)").unwrap())
             ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
             ("hashes", Regex::new(r"\b([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{56}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128}|[0-9a-fA-F]{56}|[0-9a-fA-F]{128}|[0-9a-fA-F]{224}|[0-9a-fA-F]{256}|[0-9a-fA-F]{384}|[0-9a-fA-F]{512}|[a-fA-F0-9*]{16}|[a-fA-F0-9*]{40}|[a-fA-F0-9*]{64}|[a-fA-F0-9*]{96}|[a-fA-F0-9*]{128})\b").unwrap())
-        ].iter().cloned().collect();
-        let keys: Vec<&str> = regex_map.keys().copied().collect();
-        /*
-        If the user didn't specify any extraction choices (e.g: email, url, ip_address)
-        */
-        if keys.iter().all(|value_name| !self.matches.get_one::<bool>(value_name).unwrap()) {
-            return regex_map;
+        ].iter().map(|(k, v)| (k.to_string(), v.clone())).collect();
+        
+        for plugin in &self.plugins {
+            if let Ok(regex) = Regex::new(&plugin.regex) {
+                if !regex_map.contains_key(&plugin.content_type) {
+                    regex_map.insert(plugin.content_type.clone(), regex);
+                }
+            }
         }
-        /*
-        If they did, then remove the ones they didnt select
-        */
-        let filtered_map: HashMap<&str, Regex> = keys
+        let keys: Vec<String> = regex_map.keys().cloned().collect();
+        let keys_to_keep: Vec<String> = keys
             .into_iter()
-            .filter(|&key| {
-                let has_match = self.matches.get_one(key);
-                let is_empty = regex_map[key].as_str().is_empty();
+            .filter(|key| {
+                let has_match = self.matches.get_one(&key);
+                let is_empty = regex_map[key].as_str().is_empty(); // change here
                 *has_match.unwrap() && !is_empty
-
             })
-            .map(|key| (key, regex_map[key].clone()))
             .collect();
+
+        let filtered_map: HashMap<String, Regex> = keys_to_keep
+            .into_iter()
+            .map(|key| (key.clone(), regex_map.remove(&key).unwrap()))
+            .collect();
+
         filtered_map
     }
 
+
+    // Writes content to the specified output file (-o option)
+    //  
+    // # Arguments
+    //
+    // * `&str` - Message to write to the output file
     fn write_to_file(&self, message: &str) -> () {
-        // Writes content to the specified output file (-o option)
-        //  
-        // # Arguments
-        //
-        // * `&str` - Message to write to the output file
         let mut file = match OpenOptions::new()
             .create(true)
             .append(true)
@@ -382,14 +375,14 @@ impl  DataSurgeon {
         }
     }
 
+    // This function is used to determine if a line should be printed
+    // out or not. 
+    //
+    // # Return
+    //
+    // * `bool` - True if the line should be displayed
+    // check if drop regex was set and there was a match
     fn is_worthy(&self, line: &str) -> bool {
-        // This function is used to determine if a line should be printed
-        // out or not. 
-        //
-        // # Return
-        //
-        // * `bool` - True if the line should be displayed
-        // check if drop regex was set and there was a match
         if !self.drop.is_empty() && self.drop_regex.is_match(line) {
             return false;
         }
@@ -405,14 +398,14 @@ impl  DataSurgeon {
         return false;
     }
 
-    fn handle(&mut self, line: &std::io::Result<String>, regex_map: &HashMap<&'static str, Regex>) {
-        // Searches through the specified regexes to determine if the data
-        // provided is valuable information for the provided user
-        //
-        // # Arguments
-        //
-        // * `&std::io::Result<String>` - Line to process
-        // * `regex_map`                - Created regexes to search through
+    // Searches through the specified regexes to determine if the data
+    // provided is valuable information for the provided user
+    //
+    // # Arguments
+    //
+    // * `&std::io::Result<String>` - Line to process
+    // * `regex_map`                - Created regexes to search through
+    fn handle(&mut self, line: &std::io::Result<String>, regex_map: &HashMap<String, Regex>) {
         if let Ok(line) = line {
             self.line_count += 1;
             let mut capture_set: HashSet<String> = HashSet::new();
@@ -452,14 +445,14 @@ impl  DataSurgeon {
         }
     }
 
+    // Handles the specifed line and either writes or prints it to the
+    // screen
+    //
+    // # Arguments
+    // 
+    // * `&String` - The line that had intresting content on it
+    // * `&str`    - The content that was matched to the line
     fn handle_message(&self, line: &String, content_type: &str) -> () {
-        // Handles the specifed line and either writes or prints it to the
-        // screen
-        //
-        // # Arguments
-        // 
-        // * `&String` - The line that had intresting content on it
-        // * `&str`    - The content that was matched to the line
         let message = if self.is_csv {
             match (self.hide_type, self.display, self.count) {
                 (true, true, true) => format!("{}, {}, {}", self.filename, self.line_count, line),
@@ -491,8 +484,8 @@ impl  DataSurgeon {
         }
     }
 
+    // Used to build the attributes in the clap args
     fn build_arguments(&mut self) -> () {
-        // Used to build the attributes in the clap args
         self.output_file = self.matches.get_one::<String>("output").unwrap_or(&String::new()).to_string().to_owned();
         self.is_output = !self.output_file.is_empty();
         self.clean = *self.matches.get_one::<bool>("clean").unwrap_or(&false);
@@ -503,6 +496,9 @@ impl  DataSurgeon {
         self.ignore = *self.matches.get_one::<bool>("ignore").unwrap_or(&false);
         self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
         self.directory = self.matches.get_one::<String>("directory").unwrap_or(&String::new()).to_string().to_owned();
+        let add_url = self.matches.get_one::<String>("add").unwrap_or(&String::new()).to_string().to_owned();
+        let remove_url = self.matches.get_one::<String>("remove").unwrap_or(&String::new()).to_string().to_owned();
+        let list = *self.matches.get_one::<bool>("list").unwrap_or(&false);
         self.drop = self.matches.get_one::<String>("drop").unwrap_or(&String::new()).to_string().to_owned();
         self.filter = self.matches.get_one::<String>("filter").unwrap_or(&String::new()).to_string().to_owned();
         if !self.drop.is_empty() {
@@ -510,6 +506,25 @@ impl  DataSurgeon {
         }
         if !self.filter.is_empty() {
             self.filter_regex = Regex::new(&self.filter).unwrap();
+        }
+        if list {
+            list_plugins();
+            std::process::exit(1);
+
+        }
+        if !add_url.is_empty() {
+            if add_plugin_from_url(&add_url) {
+                println!("[*] Download and added plugin: {}", add_url.clone());
+            }
+            std::process::exit(1);
+
+        }
+        if !remove_url.is_empty() {
+            if remove_plugins_from_url(&remove_url) {
+                println!("[*] Removed plugin: {}", remove_url.clone());
+            }
+            std::process::exit(1);
+
         }
         if self.is_output {
             let parts: Vec<&str> = self.output_file.split(".").collect();
@@ -532,10 +547,8 @@ impl  DataSurgeon {
         }
     }
 
-    
-
+    // Iterates through the specified file to find important information
     fn iterate_file(&mut self) -> () {
-        // Iterates through the specified file to find important information
         match File::open(Path::new(&self.filename)) {
             Ok(file) => {
                 let reader = BufReader::new(file);
@@ -561,19 +574,19 @@ impl  DataSurgeon {
         }
     }
 
+    // Prints the error to the screen unless the "--ignore" option is enabled
+    // 
+    // # Arguments
+    //
+    // * `String` -  Message to print to the screen
     fn print_error(&self, message: String) -> () {
-        // Prints the error to the screen unless the "--ignore" option is enabled
-        // 
-        // # Arguments
-        //
-        // * `String` -  Message to print to the screen
         if !self.ignore { 
             println!("[-] {}", message);
         }
     }
 
+    // Iterates through ALL files found in the specified directory "--directory" option 
     fn iterate_files(&mut self) -> () {
-        // Iterates through ALL files found in the specified directory "--directory" option 
         let regex_map = self.build_regex_query();
         for entry in WalkDir::new(self.directory.clone()).into_iter() {
             match entry {
@@ -609,12 +622,10 @@ impl  DataSurgeon {
             }
         }
     }
-    
 
     
-
+    // Creates the headers for the outputted CSV file
     fn create_headers(&self) -> () {
-        // Creates the headers for the outputted CSV file
         let message = match (self.hide_type, self.display, self.count) {
             (true, true, true) => format!("file, line, data"),
             (true, true, false) => format!("file, data"),
@@ -628,8 +639,8 @@ impl  DataSurgeon {
         self.write_to_file(&message);
     }
 
+    // Iterates through the standard input to find important informatio
     fn iterate_stdin(&mut self) -> () {
-        // Iterates through the standard input to find important informatio
         if !self.matches.get_one::<bool>("suppress").unwrap_or(&false) {
             println!("[*] Reading standard input. If you meant to analyze a file use 'ds -f <FILE>' (ctrl+c to exit)");
         }
@@ -642,21 +653,21 @@ impl  DataSurgeon {
 
     }
 
+    // Displays how long the program took
+    //
+    // # Arguments
+    //
+    // * `f32` - Time that has elapsed
     fn display_time(&self, elapsed: f32) -> () {
-        // Displays how long the program took
-        //
-        // # Arguments
-        //
-        // * `f32` - Time that has elapsed
         let hours: u32 = (elapsed / 3600.0) as u32;
         let minutes: u32 = ((elapsed / 60.0) as u32) % 60;
         let seconds: u32 = (elapsed as u32) % 60;
         println!("[*] Time elapsed: {:02}h:{:02}m:{:02}s", hours, minutes, seconds);
     }
 
+    // Searches for important information if the user specified a file othewise
+    // the standard output is iterated through
     fn process(&mut self) -> () {
-        // Searches for important information if the user specified a file othewise
-        // the standard output is iterated through
         self.build_arguments();
         let start = Instant::now();
         if !self.filename.is_empty() {
@@ -672,12 +683,10 @@ impl  DataSurgeon {
     }
 }
 
+// Creates the arguments parser
+// Creates an instance of DataSurgeon
+// Calls DataSurgeon.process()
 fn main() -> Result<(), std::io::Error> {
-    /*
-    1. Creates the arguments parser
-    2. Creates an instance of DataSurgeon
-    3. Calls DataSurgeon.process()
-    */
     let mut ds = DataSurgeon::new();
     ds.process();
     Ok(())
