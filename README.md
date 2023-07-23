@@ -1,18 +1,25 @@
-# DataSurgeon v1.1.4
+# DataSurgeon v1.2.0
 ![preview](media/main.gif)
 DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetration testing, and CTF challenges. It allows for the extraction of various types of sensitive information including emails, phone numbers, hashes, credit cards, URLs, IP addresses, MAC addresses, SRV DNS records and a lot more!
 
 * Supports Windows, Linux and MacOS
 * Support recursive file analysis within directories
+* Plugin Support
 * CSV Output
 
 # Quick Links
 * [Extraction Features](#extraction-features )
+* [Recent Updates](#recent-updates)
 * [Quick Install](#quick-install)
 * [Command Line Arguments](#command-line-arguments)
 * [Examples](#examples)
 * [Speed Tests](#speed-tests)
-* [Recent Updates](#recent-updates)
+* [Managing Plugins](#managing-plugins)
+    - [Adding a New Plugin](#adding-a-new-plugin)
+    - [How to Use Your New Plugin](#how-to-use-your-new-plugin)
+    - [Removing a Plugin](#removing-a-plugin)
+    - [Listing All Plugins](#listing-all-plugins)
+    - [Creating Your Own Plugin](https://github.com/Drew-Alleman/ds-winreg-plugin/blob/main/README.md#creating-your-own-plugin)
 * <b>[Reporting Issues](#reporting-issues)</b>
 * [Project Goals](#project-goals)
 
@@ -37,8 +44,9 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
     - NTLM
     - bcrypt
 
-### Want more? 
-Please read the contributing guidelines [here](https://github.com/Drew-Alleman/DataSurgeon/blob/main/CONTRIBUTING.md#adding-a-new-regex--extraction-feature)
+# Recent Updates
+# 5/25/2023 | 1.2.0
+Added the ```add```, ```--remove```, and ```--list``` option to manage plugins. I also created the https://github.com/Drew-Alleman/ds-winreg-plugin/ plugin to catch windows registry paths.
 
 # Quick Install
 The quick installer can also be used to update DataSurgeon. 
@@ -127,17 +135,42 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -t -i -m` | 00h:00m:22 | 2
 `cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
 
-# Recent Updates
-## 5/25/2023 | 1.1.4
-Added the ```--line``` or ```-l``` option which when enabled will show the line number the content was found on in the specified file/stream. 
-## 5/24/2023 | 1.1.3
-Added a few custom error messages and the ```--ignore``` option which is used to ignore said messages that might be printed to the screen.
-## 4/25/2023 | 1.1.2
-This update includes the addition of the dependency "walkdir". The directory option is used to process all files found in the specified directory you can still use the -D or --display option to show the file where the match was located.
-## 4/25/2023 | 1.1.1
-Include only lines that match the specified regex. (e.g: ```--filter ^error``` will only include lines that start with the word 'error')
-### 4/25/2023 | (Windows Installer Update)
-After reinstalling DataSurgeon, the installation path "C:/ds/" was appended to the end of the user's environmental variable path, even if it was already installed. (Fixed)
+## Managing Plugins
+### Adding a New Plugin
+To add a new plugin you need to use the ```--add <URL>``` option. The URL needs to be a remote github repository hosting a ```plugins.json``` file.
+```
+drew@DESKTOP-A5AO3TO:~$ ds --add https://github.com/Drew-Alleman/ds-winreg-plugin/
+[*] Download and added plugin: https://github.com/Drew-Alleman/ds-winreg-plugin/
+```
+### Listing All Plugins
+To list all plugins you can use the ```--list``` option.
+```
+drew@DESKTOP-A5AO3TO$ ds --list
+
+Plugin File: /home/drew/.DataSurgeon/plugins.json
+
+Source URL                                       | Argument Long Name
+https://github.com/Drew-Alleman/ds-winreg-plugin | numbers
+```
+### How to Use Your New Plugin
+Once your plugin file is loaded, the option will be added as an additional argument. As you can see the name of the argument is the ```Argument Long Name```.
+
+```
+drew@DESKTOP-A5AO3TO$ ds -h
+
+Options:
+   ......
+  -a, --aws                    Extract AWS keys
+      --winregistry            Extracts windows registry paths
+  -V, --version                Print version
+```
+
+### Removing a Plugin
+To remove a plugin you don't want anymore you can use the ```--remove``` option.
+```
+drew@DESKTOP-A5AO3TO:~$ ds --remove https://github.com/Drew-Alleman/ds-winreg-plugin//
+[*] Removed plugin: https://github.com/Drew-Alleman/ds-winreg-plugin//
+```
 
 # Reporting Issues
 When filling out a new issue please answer ALL questions on the  [bug template](https://github.com/Drew-Alleman/DataSurgeon/blob/main/.github/ISSUE_TEMPLATE/bug_report.md). Issues with not enough information will be closed. 
