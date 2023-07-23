@@ -21,7 +21,7 @@ fi
 # Clone DataSurgeon's source from Github
 echo "[*] Downloading DataSurgeon's source from Github..."
 if git clone https://github.com/Drew-Alleman/DataSurgeon; then
-    cd DataSurgeon
+    cd DataSurgeon || exit
     # Build the project
     cargo build --release
 else
@@ -31,7 +31,7 @@ fi
 
 # Check if the build succeeded
 if [ -f "target/release/ds" ]; then
-    if read -t 300 -p "Would you like to add 'ds' to your local bin? This will make 'ds' executable from any location in your terminal. (y/n) " response; then
+    if read -r -t 300 -p "Would you like to add 'ds' to your local bin? This will make 'ds' executable from any location in your terminal. (y/n) " response; then
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
             echo "[*] Adding 'ds' to your local bin..."
             chmod +x target/release/ds
