@@ -1,3 +1,5 @@
+Start-Sleep -Milliseconds 1000
+
 $executableDirectory = "C:/ds/"
 $executablePath = "$executableDirectory" + "ds.exe";
 
@@ -22,11 +24,20 @@ if (!(Test-Path -Path $executableDirectory -PathType Container)) {
 }
 
 copy "$(Get-Location)\target\release\ds.exe" $executablePath
-copy "$(Get-Location)\plugins.json" $executableDirectory
+if (!(Test-Path -Path "$executableDirectory\plugins.json" -PathType Leaf)) {
+  copy "$(Get-Location)\plugins.json" $executableDirectory
+} else {
+    Write-Host "[*] Existing plugins.json found, leaving it intact."
+}
 
 if ((Get-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Environment' -Name PATH -ErrorAction SilentlyContinue).Path -split ';' -notcontains $executableDirectory) {
-    Write-Host "[*] Binding ds.exe to user path (requires admin)"
-    setx PATH "$env:PATH;$executableDirectory"
+    $yesOrNo = Read-Host "Would you like to add 'ds' to your PATH? This allows you to run the 'ds' command from any directory in your terminal. [Y/n]"
+    if ($yesOrNo -eq 'Y' -or $yesOrNo -eq 'y') {
+        Write-Host "[*] Binding ds.exe to user path (requires admin)"
+        setx PATH "$env:PATH;$executableDirectory"
+    } else {
+        Write-Host "Skipped adding 'ds' to PATH."
+    }
 }
 
 cd ..
