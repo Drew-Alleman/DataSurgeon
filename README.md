@@ -23,7 +23,8 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 * <b>[Reporting Issues](#reporting-issues)</b>
 * [Project Goals](#project-goals)
 
-## Extraction Features 
+# Extraction Features 
+## Core Features
 * Emails
 * Files
 * Phone numbers
@@ -43,7 +44,9 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
     - MySQL 323, MySQL 41
     - NTLM
     - bcrypt
-
+## Supported With Plugins
+* [Windows Registries](https://github.com/Drew-Alleman/ds-winreg-plugin/)
+ 
 # Recent Updates
 # 5/25/2023 | 1.2.0
 This update brings a plugin management system to DataSurgeon. You can now add, remove, and list plugins using the ````--add````, ````--remove````, and ````--list```` options.
