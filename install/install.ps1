@@ -22,7 +22,7 @@ if (!(Test-Path -Path $executableDirectory -PathType Container)) {
 }
 
 copy "$(Get-Location)\target\release\ds.exe" $executablePath
-copy "$(Get-Location)\plugins.json" $executablePath
+copy "$(Get-Location)\plugins.json" $executableDirectory
 
 if ((Get-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Environment' -Name PATH -ErrorAction SilentlyContinue).Path -split ';' -notcontains $executableDirectory) {
     Write-Host "[*] Binding ds.exe to user path (requires admin)"
