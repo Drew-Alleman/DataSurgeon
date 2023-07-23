@@ -46,8 +46,13 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 
 # Recent Updates
 # 5/25/2023 | 1.2.0
-Added the ```add```, ```--remove```, and ```--list``` option to manage plugins. I also created the https://github.com/Drew-Alleman/ds-winreg-plugin/ plugin to catch windows registry paths.
+This update brings a plugin management system to DataSurgeon. You can now add, remove, and list plugins using the ````--add````, ````--remove````, and ````--list```` options.
 
+I also added a new plugin, [ds-winreg-plugin](https://github.com/Drew-Alleman/ds-winreg-plugin/), that can find Windows registry paths.
+
+To add a new plugin, use ````--add <URL>````, where the URL is a GitHub repository with a ````plugins.json```` file. To remove a plugin, use ````--remove <URL>````. To see all your plugins, use the ````--list```` option.
+
+Once a plugin is added, you can use it as an argument in DataSurgeon. The argument's name is the "Argument Long Name" in the plugin's ````plugins.json```` file.
 # Quick Install
 The quick installer can also be used to update DataSurgeon. 
 
