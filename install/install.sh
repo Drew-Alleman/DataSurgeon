@@ -37,17 +37,17 @@ fi
 
 # Check if the build succeeded
 if [ -f "target/release/ds" ]; then
-    if read -r -p "Would you like to add 'ds' to your local bin? This will make 'ds' executable from any location in your terminal. (y/n) " response; then
-        if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-            echo "[*] Adding 'ds' to your local bin..."
-            chmod +x target/release/ds
-            sudo mv target/release/ds /usr/local/bin/
-        else
-            echo "Skipped adding 'ds' to local bin."
-        fi
+    if [[ "$1" =~ ^([yY][eE][sS]|[yY])$ ]]; then        
+        echo "[*] Adding 'ds' to your local bin..."
+        chmod +x target/release/ds
+        sudo mv target/release/ds /usr/local/bin/
     else
-        echo "Timed out. Skipped adding 'ds' to local bin."
+        echo "Skipped adding 'ds' to local bin."
     fi
+else
+    echo "[!] Build failed. The 'ds' executable does not exist."
+    exit 1
+fi
 else
     echo "[!] Build failed. The 'ds' executable does not exist."
     exit 1
