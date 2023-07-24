@@ -37,7 +37,7 @@ fi
 
 # Check if the build succeeded
 if [ -f "target/release/ds" ]; then
-    if read -r -t 300 -p "Would you like to add 'ds' to your local bin? This will make 'ds' executable from any location in your terminal. (y/n) " response; then
+    if read -r -p "Would you like to add 'ds' to your local bin? This will make 'ds' executable from any location in your terminal. (y/n) " response; then
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
             echo "[*] Adding 'ds' to your local bin..."
             chmod +x target/release/ds
