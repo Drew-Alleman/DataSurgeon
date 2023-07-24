@@ -4,7 +4,7 @@
 sleep 1
 # Update OS and install OpenSSL libraries
 echo "[*] Updating OS and installing OpenSSL libraries... (password required)"
-sudo apt update && sudo apt upgrade && sudo apt install pkg-config libssl-dev
+sudo apt update > /dev/null && sudo apt upgrade > /dev/null && sudo apt install pkg-config libssl-dev > /dev/null
 
 # Check and remove existing DataSurgeon directory if it exists
 if [ -d "DataSurgeon" ]; then
@@ -20,10 +20,16 @@ fi
 
 # Clone DataSurgeon's source from Github
 echo "[*] Downloading DataSurgeon's source from Github..."
-if git clone https://github.com/Drew-Alleman/DataSurgeon; then
+if git clone https://github.com/Drew-Alleman/DataSurgeon > /dev/null 2>&1; then
     cd DataSurgeon || exit
     # Build the project
-    cargo build --release
+    echo "[*] Building the project..."
+    if cargo build --release > /dev/null 2>&1; then
+        echo "[*] Build succeeded."
+    else
+        echo "[!] Build failed."
+        exit 1
+    fi
 else
     echo "[!] Failed to download DataSurgeon from Github"
     exit 1
