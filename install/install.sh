@@ -48,10 +48,6 @@ else
     echo "[!] Build failed. The 'ds' executable does not exist."
     exit 1
 fi
-else
-    echo "[!] Build failed. The 'ds' executable does not exist."
-    exit 1
-fi
 
 # Check for existing plugins.json and only move the new file if it doesn't exist
 mkdir -p ~/.DataSurgeon
