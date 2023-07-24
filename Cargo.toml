@@ -11,10 +11,18 @@ categories = ["osint", "email", "regex", "incident-response", "hacking", "ip-add
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-regex = "1.7.1"
-clap = "4.1.8"
-walkdir = "2.3.3"
-serde_json = "1.0.103"
-serde = { version="1.0.174" , features = ["derive"] }
+# Networking dependencies for downloading and updating plugins
 reqwest = { version="0.11.18" , features = ["blocking"] }
 
+# Serialization dependencies
+serde = { version="1.0.174" , features = ["derive"] }
+serde_json = "1.0.103"
+
+# File and directory handling dependencies
+walkdir = "2.3.3"
+
+# Command line parsing dependencies
+clap = "4.1.8"
+
+# Regular expression dependencies
+regex = "1.7.1"
