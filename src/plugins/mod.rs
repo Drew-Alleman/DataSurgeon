@@ -179,7 +179,8 @@ pub fn add_plugin_from_url(url: &str) -> bool {
     let plugins: Vec<RegexPlugin> = match get_plugins_from_url(&url) {
         Ok(mut plugins) => {
             for plugin in &mut plugins {
-                plugin.source_url = plugin.source_url.trim_end_matches('/').to_string();
+                // Update the source_url of the plugin to match the provided URL
+                plugin.source_url = url.trim_end_matches("/main/plugins.json").to_string();
             }
             plugins
         },
