@@ -43,11 +43,11 @@ To learn how to manage plugins please follow the guide [here](#managing-plugins)
 ## Security Information
 * Google API Private Key ID's
 * AWS Keys
-* [CVE Numbers](https://github.com/DataSurgeon-ds/ds-cve-plugin/) [(PLUGIN)](#managing-plugins)
+* [CVE Numbers](https://github.com/DataSurgeon-ds/ds-cve-plugin/) (PLUGIN)
 
 ## System and File Information 
 * Files
-* [Windows Registries](https://github.com/Drew-Alleman/ds-winreg-plugin/) [(PLUGIN)](#managing-plugins)
+* [Windows Registries](https://github.com/Drew-Alleman/ds-winreg-plugin/) (PLUGIN)
   
 ## Hashes
 * MD4 & MD5
