@@ -24,28 +24,47 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 * [Project Goals](#project-goals)
 
 # Extraction Features 
+
 ## Core Features
+
+### Personal Information
 * Emails
-* Files
 * Phone numbers
-* Credit Cards
-* Google API Private Key ID's
 * Social Security Numbers
-* AWS Keys
+
+### Financial Information
+* Credit Cards
 * Bitcoin wallets
+
+### Network Information
 * URL's
 * IPv4 Addresses and IPv6 addresses
 * MAC Addresses
 * SRV DNS Records
-* Extract Hashes
-    - MD4 & MD5
-    - SHA-1, SHA-224, SHA-256, SHA-384, SHA-512
-    - SHA-3 224, SHA-3 256, SHA-3 384, SHA-3 512
-    - MySQL 323, MySQL 41
-    - NTLM
-    - bcrypt
-## Supported With Plugins
+
+### Security Information
+* Google API Private Key ID's
+* AWS Keys
+
+### File Information
+* Files
+
+### Hashes
+* MD4 & MD5
+* SHA-1, SHA-224, SHA-256, SHA-384, SHA-512
+* SHA-3 224, SHA-3 256, SHA-3 384, SHA-3 512
+* MySQL 323, MySQL 41
+* NTLM
+* bcrypt
+
+## Additional Extraction Features, Supported With Plugins...
+
+### System Information
 * [Windows Registries](https://github.com/Drew-Alleman/ds-winreg-plugin/)
+
+### Security Information
+* [CVE Numbers](https://github.com/DataSurgeon-ds/ds-cve-plugin/)
+
  
 # Recent Updates
 # 5/25/2023 | 1.2.0
