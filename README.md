@@ -19,7 +19,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
     - [How to Use Your New Plugin](#how-to-use-your-new-plugin)
     - [Removing a Plugin](#removing-a-plugin)
     - [Listing All Plugins](#listing-all-plugins)
-    - [Creating Your Own Plugin](https://github.com/Drew-Alleman/ds-winreg-plugin/blob/main/README.md#creating-your-own-plugin)
+    - [Creating Your Own Plugin](https://github.com/DataSurgeon-ds/ds-winreg-plugin/blob/main/README.md#creating-your-own-plugin)
 * <b>[Reporting Issues](#reporting-issues)</b>
 * [Project Goals](#project-goals)
 
