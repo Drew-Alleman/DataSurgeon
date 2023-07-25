@@ -24,32 +24,32 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 * [Project Goals](#project-goals)
 
 # Extraction Features 
-
-## Core Features
-
-### Personal Information
+To learn how to manage plugins please follow the guide [here](#managing-plugins). 
+## Personal Information
 * Emails
 * Phone numbers
 * Social Security Numbers
 
-### Financial Information
+## Financial Information
 * Credit Cards
 * Bitcoin wallets
 
-### Network Information
+## Network Information
 * URL's
 * IPv4 Addresses and IPv6 addresses
 * MAC Addresses
 * SRV DNS Records
 
-### Security Information
+## Security Information
 * Google API Private Key ID's
 * AWS Keys
+* [CVE Numbers](https://github.com/DataSurgeon-ds/ds-cve-plugin/) [(PLUGIN)](#managing-plugins)
 
-### File Information
+## System and File Information 
 * Files
-
-### Hashes
+* [Windows Registries](https://github.com/Drew-Alleman/ds-winreg-plugin/) [(PLUGIN)](#managing-plugins)
+  
+## Hashes
 * MD4 & MD5
 * SHA-1, SHA-224, SHA-256, SHA-384, SHA-512
 * SHA-3 224, SHA-3 256, SHA-3 384, SHA-3 512
@@ -57,15 +57,6 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 * NTLM
 * bcrypt
 
-## Additional Extraction Features, Supported With Plugins...
-
-### System Information
-* [Windows Registries](https://github.com/Drew-Alleman/ds-winreg-plugin/)
-
-### Security Information
-* [CVE Numbers](https://github.com/DataSurgeon-ds/ds-cve-plugin/)
-
- 
 # Recent Updates
 # 5/25/2023 | 1.2.0
 This update brings a plugin management system to DataSurgeon. You can now add, remove, and list plugins using the ````--add````, ````--remove````, and ````--list```` options.
