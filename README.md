@@ -66,7 +66,7 @@ Install [Rust](https://www.rust-lang.org/tools/install) and [Github](https://git
 
 ### Linux
 ```
-wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | bash
+read -p "Would you like to add 'ds' to your local bin? This will make 'ds' executable from any location in your terminal. (y/n) " response && wget -O - https://raw.githubusercontent.com/Drew-Alleman/DataSurgeon/main/install/install.sh | bash -s -- "$response"
 ```
 
 ### Windows 
