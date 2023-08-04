@@ -161,7 +161,7 @@ pub fn load_plugins() -> Vec<RegexPlugin> {
             }
         },
         None => {
-            handle_error_and_exit(&format!("{} PLUGIN_PATH: {}", FAILED_TO_LOCATE, get_plugin_path()));
+            println!("{}", &format!("{} PLUGIN_PATH: {}", FAILED_TO_LOCATE, get_plugin_path()));
             Vec::new() // Return an empty list of plugins if the user doesn't want to exit.
         }
     }
