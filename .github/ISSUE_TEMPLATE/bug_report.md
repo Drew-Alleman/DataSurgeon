@@ -14,7 +14,7 @@ Please provide a screenshot of the FULL output of running the installer.<br><br>
 A clear and concise description of what the bug is. What feature is impacted? If the CSV outputting is broken please include an example of what you think it should look like and what was actually written. 
 
 **To Reproduce** <br>
-What command did you execute? If possible can you provide the text/file you are feeding into the DataSurgeon?
+What command did you execute? If possible can you provide the text/file you are feeding into the DataSurgeon? If the error is with loading plugins, can you provide the URL?
 
 **Expected behavior** <br>
 A clear and concise description of what you expected to happen.
