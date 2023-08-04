@@ -168,7 +168,7 @@ drew@DESKTOP-A5AO3TO$ ds --list
 Plugin File: /home/drew/.DataSurgeon/plugins.json
 
 Source URL                                       | Argument Long Name
-https://github.com/Drew-Alleman/ds-winreg-plugin | numbers
+https://github.com/Drew-Alleman/ds-winreg-plugin | winregistry
 ```
 ### How to Use Your New Plugin
 Once your plugin file is loaded, the option will be added as an additional argument. As you can see the name of the argument is the ```Argument Long Name```.
