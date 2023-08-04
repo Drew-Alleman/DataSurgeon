@@ -193,14 +193,15 @@ pub fn load_plugins() -> Vec<RegexPlugin> {
 // or if it fails to write to the plugins.json file.
 pub fn add_plugin_from_url(url: &str) -> bool {
     // Format the URL to point to the raw plugins.json file
-    let raw_url = format!("{}/main/plugins.json", url.trim_end_matches('/'));
-    let url = raw_url.replace("github.com", "raw.githubusercontent.com");
+    let trimmed_url = url.trim_end_matches('/');
+    let github_file_url = format!("{}/main/plugins.json", trimmed_url);
+    let github_raw_url = github_file_url.replace("github.com", "raw.githubusercontent.com");
 
-    let plugins: Vec<RegexPlugin> = match get_plugins_from_url(&url) {
+    let plugins: Vec<RegexPlugin> = match get_plugins_from_url(&github_raw_url) {
         Ok(mut plugins) => {
             for plugin in &mut plugins {
                 // Update the source_url of the plugin to match the provided URL
-                plugin.source_url = url.trim_end_matches("/main/plugins.json").to_string();
+                plugin.source_url = trimmed_url.to_string();
             }
             plugins
         },
