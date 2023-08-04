@@ -15,6 +15,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 * [Examples](#examples)
 * [Speed Tests](#speed-tests)
 * [Managing Plugins](#managing-plugins)
+    - [Where to Submit Plugin Suggestions](#plugin-suggestion)
     - [Adding a New Plugin](#adding-a-new-plugin)
     - [How to Use Your New Plugin](#how-to-use-your-new-plugin)
     - [Removing a Plugin](#removing-a-plugin)
@@ -154,6 +155,9 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
 
 ## Managing Plugins
+### Plugin Suggestion
+If you want a suggest an idea for a new plugin please do it [here](https://github.com/Drew-Alleman/DataSurgeon/discussions/12). 
+
 ### Adding a New Plugin
 To add a new plugin you need to use the ```--add <URL>``` option. The URL needs to be a remote github repository hosting a ```plugins.json``` file.
 ```
