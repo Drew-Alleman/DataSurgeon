@@ -4,7 +4,7 @@
 sleep 1
 # Update OS and install OpenSSL libraries
 echo "[*] Updating OS and installing OpenSSL libraries... (password required)"
-sudo apt update > /dev/null && sudo apt upgrade > /dev/null && sudo apt install pkg-config libssl-dev > /dev/null
+sudo apt-get update > /dev/null && sudo apt-get upgrade -y > /dev/null && sudo apt-get install -y pkg-config libssl-dev > /dev/null
 
 # Check and remove existing DataSurgeon directory if it exists
 if [ -d "DataSurgeon" ]; then
