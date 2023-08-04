@@ -8,16 +8,36 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 
 
+/// Returns the path to the `plugins.json` file for the DataSurgeon application.
+///
+/// # Platform Specific
+///
+/// - On Windows, the path is hard-coded as "C:\\ds\\plugins.json".
+/// - On Unix-like operating systems (including Linux and macOS), the path is dynamically determined based on the user's home directory, as stored in the `HOME` environment variable.
+///
+/// # Panics
+///
+/// - This function will panic if the `HOME` environment variable is not set on a Unix-like operating system.
+/// - This function will panic if an unsupported platform is encountered.
+///
+/// # Returns
+///
+/// A `String` containing the absolute path to the `plugins.json` file.
 fn get_plugin_path() -> String {
     #[cfg(target_os = "windows")]
     {
         return String::from("C:\\ds\\plugins.json");
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(unix)] // This targets all Unix-like systems, including Linux and macOS
     {
-        let home_dir = std::env::var("HOME").expect("Home directory not found. Failed to read enviromental variable: `HOME`.");
+        let home_dir = std::env::var("HOME").expect("Home directory not found. Failed to read environmental variable: `HOME`.");
         return format!("{}/.DataSurgeon/plugins.json", home_dir);
+    }
+
+    #[cfg(not(any(target_os = "windows", unix)))] // Fallback for other platforms
+    {
+        panic!("Unsupported platform");
     }
 }
 
