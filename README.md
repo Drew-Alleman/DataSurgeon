@@ -161,8 +161,8 @@ If you want a suggest an idea for a new plugin please do it [here](https://githu
 ### Adding a New Plugin
 To add a new plugin you need to use the ```--add <URL>``` option. The URL needs to be a remote github repository hosting a ```plugins.json``` file.
 ```
-drew@DESKTOP-A5AO3TO:~$ ds --add https://github.com/Drew-Alleman/ds-winreg-plugin/
-[*] Download and added plugin: https://github.com/Drew-Alleman/ds-winreg-plugin/
+drew@DESKTOP-A5AO3TO:~$ ds --add https://github.com/DataSurgeon-ds/ds-winreg-plugin/
+[*] Download and added plugin: https://github.com/DataSurgeon-ds/ds-winreg-plugin/
 ```
 ### Listing All Plugins
 To list all plugins you can use the ```--list``` option.
@@ -171,8 +171,8 @@ drew@DESKTOP-A5AO3TO$ ds --list
 
 Plugin File: /home/drew/.DataSurgeon/plugins.json
 
-Source URL                                       | Argument Long Name
-https://github.com/Drew-Alleman/ds-winreg-plugin | winregistry
+Source URL                                         | Argument Long Name | Version
+https://github.com/DataSurgeon-ds/ds-winreg-plugin | winregistry        | 1.0.0
 ```
 ### How to Use Your New Plugin
 Once your plugin file is loaded, the option will be added as an additional argument. As you can see the name of the argument is the ```Argument Long Name```.
@@ -190,8 +190,8 @@ Options:
 ### Removing a Plugin
 To remove a plugin you don't want anymore you can use the ```--remove``` option.
 ```
-drew@DESKTOP-A5AO3TO:~$ ds --remove https://github.com/Drew-Alleman/ds-winreg-plugin//
-[*] Removed plugin: https://github.com/Drew-Alleman/ds-winreg-plugin//
+drew@DESKTOP-A5AO3TO:~$ ds --remove https://github.com/DataSurgeon-ds/ds-winreg-plugin/
+[*] Removed plugin: https://github.com/DataSurgeon-ds/ds-winreg-plugin/
 ```
 
 # Reporting Issues
