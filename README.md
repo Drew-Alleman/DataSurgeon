@@ -14,13 +14,13 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 * [Command Line Arguments](#command-line-arguments)
 * [Examples](#examples)
 * [Speed Tests](#speed-tests)
-* [Managing Plugins](#managing-plugins)
-    - [Where to Submit Plugin Suggestions](#plugin-suggestion)
-    - [Adding a New Plugin](#adding-a-new-plugin)
-    - [How to Use Your New Plugin](#how-to-use-your-new-plugin)
-    - [Updating a Plugin](#updating-a-plugin)
-    - [Removing a Plugin](#removing-a-plugin)
-    - [Listing All Plugins](#listing-all-plugins)
+* [Managing Plugins](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#managing-plugins)
+    - [Where to Submit Plugin Suggestions](https://github.com/Drew-Alleman/DataSurgeon/discussions/12)
+    - [Adding a New Plugin](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#adding-a-new-plugin)
+    - [How to Use Your New Plugin](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#how-to-use-your-new-plugin)
+    - [Updating a Plugin](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#updating-a-plugin)
+    - [Removing a Plugin](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#removing-a-plugin)
+    - [Listing All Plugins](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#listing-all-plugins)
     - [Creating Your Own Plugin](https://github.com/DataSurgeon-ds/ds-winreg-plugin/blob/main/README.md#creating-your-own-plugin)
 * <b>[Reporting Issues](#reporting-issues)</b>
 * [Project Goals](#project-goals)
@@ -154,60 +154,6 @@ Command         | Speed          | Query Count
 `cat test.txt \| ds -t -6` | 00h:00m:12s | 1
 `cat test.txt \| ds -t -i -m` | 00h:00m:22 | 2
 `cat test.txt \| ds -tF6c` | 00h:00m:32s | 3
-
-## Managing Plugins
-### Plugin Suggestion
-If you want a suggest an idea for a new plugin please do it [here](https://github.com/Drew-Alleman/DataSurgeon/discussions/12). 
-
-### Adding a New Plugin
-To add a new plugin you need to use the ```--add <URL>``` option. The URL needs to be a remote github repository hosting a ```plugins.json``` file.
-```
-drew@DESKTOP-A5AO3TO:~$ ds --add https://github.com/DataSurgeon-ds/ds-winreg-plugin/
-[*] Download and added plugin: https://github.com/DataSurgeon-ds/ds-winreg-plugin/
-```
-### Listing All Plugins
-To list all plugins you can use the ```--list``` option.
-```
-drew@DESKTOP-A5AO3TO$ ds --list
-Plugin File: /home/drew/.DataSurgeon/plugins.json
-
-Source URL                                         | Version | Argument Long Name
-https://github.com/DataSurgeon-ds/ds-winreg-plugin | 1.0.0   | winregistry
-https://github.com/DataSurgeon-ds/ds-cve-plugin    | 1.0.0   | cve
-```
-### How to Use Your New Plugin
-Once your plugin file is loaded, the option will be added as an additional argument. As you can see the name of the argument is the ```Argument Long Name```.
-
-```
-drew@DESKTOP-A5AO3TO$ ds -h
-
-Options:
-   ......
-  -a, --aws                    Extract AWS keys
-      --winregistry            Extracts windows registry paths
-  -V, --version                Print version
-```
-
-### Updating a Plugin
-You can update an existing plugin by using it's ```Source URL``` or you can all plugins by passing ```all```.
-
-#### Updating a Specific Plugin
-```
-drew@DESKTOP-A5AO3TO$ ds --update https://github.com/DataSurgeon-ds/ds-cve-plugin
-[*] Updated Plugin: https://github.com/DataSurgeon-ds/ds-cve-plugin
-```
-#### Updating all Plugins
-```
-drew@DESKTOP-A5AO3TO$ ds --update all
-[*] Updated Plugin: https://github.com/DataSurgeon-ds/ds-winreg-plugin
-[*] Updated Plugin: https://github.com/DataSurgeon-ds/ds-cve-plugin
-```
-### Removing a Plugin
-To remove a plugin you don't want anymore you can use the ```--remove``` option.
-```
-drew@DESKTOP-A5AO3TO:~$ ds --remove https://github.com/DataSurgeon-ds/ds-winreg-plugin/
-[*] Removed plugin: https://github.com/DataSurgeon-ds/ds-winreg-plugin/
-```
 
 # Reporting Issues
 When filling out a new issue please answer ALL questions on the  [bug template](https://github.com/Drew-Alleman/DataSurgeon/blob/main/.github/ISSUE_TEMPLATE/bug_report.md). Issues with not enough information will be closed. 
