@@ -24,7 +24,7 @@ if git clone https://github.com/Drew-Alleman/DataSurgeon > /dev/null 2>&1; then
     cd DataSurgeon || exit
     # Build the project
     echo "[*] Building the project..."
-    if cargo build --release > /dev/null 2>&1; then
+    if cargo build --release then
         echo "[*] Build succeeded."
     else
         echo "[!] Build failed."
