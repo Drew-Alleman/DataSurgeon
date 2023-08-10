@@ -18,6 +18,7 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
     - [Where to Submit Plugin Suggestions](#plugin-suggestion)
     - [Adding a New Plugin](#adding-a-new-plugin)
     - [How to Use Your New Plugin](#how-to-use-your-new-plugin)
+    - [Updating a Plugin](#updating-a-plugin)
     - [Removing a Plugin](#removing-a-plugin)
     - [Listing All Plugins](#listing-all-plugins)
     - [Creating Your Own Plugin](https://github.com/DataSurgeon-ds/ds-winreg-plugin/blob/main/README.md#creating-your-own-plugin)
@@ -168,11 +169,11 @@ drew@DESKTOP-A5AO3TO:~$ ds --add https://github.com/DataSurgeon-ds/ds-winreg-plu
 To list all plugins you can use the ```--list``` option.
 ```
 drew@DESKTOP-A5AO3TO$ ds --list
-
 Plugin File: /home/drew/.DataSurgeon/plugins.json
 
-Source URL                                         | Argument Long Name | Version
-https://github.com/DataSurgeon-ds/ds-winreg-plugin | winregistry        | 1.0.0
+Source URL                                         | Version | Argument Long Name
+https://github.com/DataSurgeon-ds/ds-winreg-plugin | 1.0.0   | winregistry
+https://github.com/DataSurgeon-ds/ds-cve-plugin    | 1.0.0   | cve
 ```
 ### How to Use Your New Plugin
 Once your plugin file is loaded, the option will be added as an additional argument. As you can see the name of the argument is the ```Argument Long Name```.
@@ -187,6 +188,20 @@ Options:
   -V, --version                Print version
 ```
 
+### Updating a Plugin
+You can update an existing plugin by using it's ```Source URL``` or you can all plugins by passing ```all```.
+
+#### Updating a Specific Plugin
+```
+drew@DESKTOP-A5AO3TO$ ds --update https://github.com/DataSurgeon-ds/ds-cve-plugin
+[*] Updated Plugin: https://github.com/DataSurgeon-ds/ds-cve-plugin
+```
+#### Updating all Plugins
+```
+drew@DESKTOP-A5AO3TO$ ds --update all
+[*] Updated Plugin: https://github.com/DataSurgeon-ds/ds-winreg-plugin
+[*] Updated Plugin: https://github.com/DataSurgeon-ds/ds-cve-plugin
+```
 ### Removing a Plugin
 To remove a plugin you don't want anymore you can use the ```--remove``` option.
 ```
