@@ -17,10 +17,10 @@ DataSurgeon (ds) is a versatile tool designed for incident response, DLP, penetr
 * [Managing Plugins](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#managing-plugins)
     - [Where to Submit Plugin Suggestions](https://github.com/Drew-Alleman/DataSurgeon/discussions/12)
     - [Adding a New Plugin](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#adding-a-new-plugin)
+    - [Listing All Plugins](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#listing-all-plugins)
     - [How to Use Your New Plugin](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#how-to-use-your-new-plugin)
     - [Updating a Plugin](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#updating-a-plugin)
     - [Removing a Plugin](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#removing-a-plugin)
-    - [Listing All Plugins](https://github.com/Drew-Alleman/DataSurgeon/wiki/Plugin-Guide-%F0%9F%94%8C#listing-all-plugins)
     - [Creating Your Own Plugin](https://github.com/DataSurgeon-ds/ds-winreg-plugin/blob/main/README.md#creating-your-own-plugin)
 * <b>[Reporting Issues](#reporting-issues)</b>
 * [Project Goals](#project-goals)
