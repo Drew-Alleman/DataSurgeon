@@ -276,7 +276,7 @@ pub fn remove_plugins_from_url(url: &str) -> bool {
 
     // Check if any of the existing plugins were added from the specified URL
     let mut removed = false;
-    for i in (0..existing_plugins.len()).resv() {
+    for i in (0..existing_plugins.len()).rev() {
         let normalized_url = normalize_url(&url);
         let plugin_url = normalize_url(&existing_plugins[i].source_url);
         if plugin_url == normalized_url {
