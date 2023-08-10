@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Source the RUST ENV file
-
 source "$HOME/.cargo/env"
 # Sleep to let the web request finish
 sleep 1
