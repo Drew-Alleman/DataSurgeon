@@ -55,6 +55,7 @@ in the `plugins.json` file. ALL FIELDS are required....
         "arg_long_name": "numbers",
         "help_message": "Extracts numbers",
         "regex": "(\\d+)",
+        "version": "1.0.0",
         "source_url": "https://github.com/Drew-Alleman/ds-test-plugin/"
     }
 
@@ -65,6 +66,7 @@ pub struct RegexPlugin {
     pub help_message: String,
     pub content_type: String,
     pub source_url: String,
+    pub version: String,
     pub regex: String,
 }
 
@@ -196,7 +198,6 @@ pub fn add_plugin_from_url(url: &str) -> bool {
     let trimmed_url = url.trim_end_matches('/');
     let github_file_url = format!("{}/main/plugins.json", trimmed_url);
     let github_raw_url = github_file_url.replace("github.com", "raw.githubusercontent.com");
-
     let plugins: Vec<RegexPlugin> = match get_plugins_from_url(&github_raw_url) {
         Ok(mut plugins) => {
             for plugin in &mut plugins {
@@ -275,7 +276,7 @@ pub fn remove_plugins_from_url(url: &str) -> bool {
 
     // Check if any of the existing plugins were added from the specified URL
     let mut removed = false;
-    for i in (0..existing_plugins.len()).rev() {
+    for i in (0..existing_plugins.len()).resv() {
         let normalized_url = normalize_url(&url);
         let plugin_url = normalize_url(&existing_plugins[i].source_url);
         if plugin_url == normalized_url {
@@ -326,19 +327,65 @@ pub fn list_plugins() {
     // Define the widths of the columns
     let url_width = existing_plugins
         .iter()
-        .max_by_key(|p| p.source_url.len())
+        .map(|p| p.source_url.len())
+        .max()
         .unwrap()
-        .source_url
-        .len();
+        .max("Source URL".len());
+    let version_width = existing_plugins
+        .iter()
+        .map(|p| p.version.len())
+        .max()
+        .unwrap()
+        .max("Version".len());
     let arg_width = existing_plugins
         .iter()
-        .max_by_key(|p| p.arg_long_name.len())
+        .map(|p| p.arg_long_name.len())
+        .max()
         .unwrap()
-        .arg_long_name
-        .len();
+        .max("Argument Long Name".len());
 
-    println!("{:<width$} | {:<arg_width$}", "Source URL", "Argument Long Name", width = url_width, arg_width = arg_width);
+    println!("{:<width$} | {:<version_width$} | {:<arg_width$}", "Source URL", "Version", "Argument Long Name", width = url_width, version_width = version_width, arg_width = arg_width);
     for plugin in &existing_plugins {
-        println!("{:<width$} | {:<arg_width$}", plugin.source_url, plugin.arg_long_name, width = url_width, arg_width = arg_width);
+        println!("{:<width$} | {:<version_width$} | {:<arg_width$}", plugin.source_url, plugin.version, plugin.arg_long_name, width = url_width, version_width = version_width, arg_width = arg_width);
+    }
+}
+
+/// Updates a plugin by removing the existing one and adding the new one from the given URL.
+///
+/// This function first removes the existing plugins associated with the given URL and then adds the new plugin from that URL.
+///add_plugin_from_url
+/// # Arguments
+///
+/// * `url` - A string slice that holds the URL of the plugin.
+///
+/// # Returns
+///
+/// * `bool` - Returns true if the plugin was updated successfully, false otherwise.
+pub fn update_plugin_from_url(url: &str) -> bool {
+    // Remove existing plugins from the URL
+    let removed = remove_plugins_from_url(url);
+
+    // If any plugins were removed, add the new plugin from the URL
+    if removed {
+        add_plugin_from_url(url)
+    } else {
+        println!("[-] Error: No existing plugin found with the given URL: {}", url);
+        false
+    }
+}
+
+
+// Updates all installed plugins by their URLs
+pub fn update_all_plugins() {
+    // Load existing plugins
+    let existing_plugins = load_plugins();
+
+    // Iterate through the plugins and update them by URL
+    for plugin in existing_plugins {
+        if update_plugin_from_url(&plugin.source_url) {
+            println!("[*] Updated Plugin: {}", plugin.source_url);
+        } else {
+            println!("[-] Failed to Update Plugin: {}", plugin.source_url);
+        }
     }
 }
