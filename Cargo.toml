@@ -1,6 +1,6 @@
 [package]
 name = "ds"
-version = "1.2.3"
+version = "1.2.4"
 edition = "2021"
 authors = ["Drew Alleman"]
 repository = "https://github.com/Drew-Alleman/DataSurgeon/"
