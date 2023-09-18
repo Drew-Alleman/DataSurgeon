@@ -286,15 +286,20 @@ impl  DataSurgeon {
     // # Return
     //
     // * `HashMap<&'static str, Regex>` - A HashMap containg the content type and the regex associated
+    // Builds a regex query to search for important information
+    //
+    // # Return
+    //
+    // * `HashMap<&'static str, Regex>` - A HashMap containg the content type and the regex associated
     fn build_regex_query(&self) -> HashMap<String, Regex>{
         let mut regex_map: HashMap<String, Regex> = [
             ("credit_card", Regex::new(r"\b(\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b").unwrap()),
             ("email", Regex::new(r"\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})\b").unwrap()),
             ("url", Regex::new(r#"(https?://(?:[^\s.,;:"'<>()\[\]{}]+\.)*[^\s.,;:"'<>()\[\]{}]+(/[^\s]*[^\s.,;:"'<>()\[\]{}\s])?)"#).unwrap()),
-            ("ip_address", Regex::new(r"\b((?:\d{1,3}\.){3}\d{1,3})\b").unwrap()),
+            ("ip_address", Regex::new(r"\b((?:\d{1,3}\.){3}\d{1,3}(?:/\d{1,2})?)\b").unwrap()),
             ("social_security", Regex::new(r"\b(\d{3}-\d{2}-\d{4})\b").unwrap()),
-            ("ipv6_address", Regex::new(r"([0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4}){7})").unwrap()),
             ("phone_number", Regex::new(r"(\b[2-9]\d{2}-\d{3}-\d{4}\b)").unwrap()),
+            ("ipv6_address", Regex::new(r"((?:[0-9a-fA-F]{1,4}:){1,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:))(?:/\d{1,3})?").unwrap()),
             ("srv_dns", Regex::new(r"\b(.+?)\s+IN\s+SRV\s+\d+\s+\d+\s+\d+\s+(.+)\b").unwrap()),
             ("mac_address", Regex::new(r"([0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5})").unwrap()),
             ("google", Regex::new(r#""private_key_id":\s*"(\w{40})""#).unwrap()),
@@ -304,7 +309,8 @@ impl  DataSurgeon {
             ("files", Regex::new(r"([\w,\s-]+\.(txt|pdf|doc|docx|xls|xlsx|xml|jpg|jpeg|png|gif|bmp|csv|json|yaml|log|tar|tgz|gz|zip|rar|7z|exe|dll|bat|ps1|sh|py|rb|js|mdb|sql|db|dbf|ini|cfg|conf|bak|old|backup|pgp|gpg|aes|dll|sys|drv|ocx|pcap|tcpdump))").unwrap()),
             ("hashes", Regex::new(r"\b([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{56}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128}|[0-9a-fA-F]{56}|[0-9a-fA-F]{128}|[0-9a-fA-F]{224}|[0-9a-fA-F]{256}|[0-9a-fA-F]{384}|[0-9a-fA-F]{512}|[a-fA-F0-9*]{16}|[a-fA-F0-9*]{40}|[a-fA-F0-9*]{64}|[a-fA-F0-9*]{96}|[a-fA-F0-9*]{128})\b").unwrap())
         ].iter().map(|(k, v)| (k.to_string(), v.clone())).collect();
-        
+
+            // Merge with plugins
         for plugin in &self.plugins {
             if let Ok(regex) = Regex::new(&plugin.regex) {
                 if !regex_map.contains_key(&plugin.content_type) {
@@ -312,24 +318,27 @@ impl  DataSurgeon {
                 }
             }
         }
-        let keys: Vec<String> = regex_map.keys().cloned().collect();
-        let keys_to_keep: Vec<String> = keys
-            .into_iter()
-            .filter(|key| {
-                let has_match = self.matches.get_one(&key);
-                let is_empty = regex_map[key].as_str().is_empty(); // change here
-                *has_match.unwrap() && !is_empty
-            })
+    
+       
+        let keys_to_keep: Vec<String> = regex_map.keys()
+            .filter(|&key| *self.matches.get_one::<bool>(key).unwrap_or(&false))
+            .cloned()
             .collect();
-
+    
+        // If no keys were passed as arguments, return the entire map
+        if keys_to_keep.is_empty() {
+            return regex_map;
+        }
+    
+        // Otherwise, filter the map based on the keys passed as arguments
         let filtered_map: HashMap<String, Regex> = keys_to_keep
             .into_iter()
-            .map(|key| (key.clone(), regex_map.remove(&key).unwrap()))
+            .filter_map(|key| regex_map.remove(&key).map(|value| (key, value)))
             .collect();
-
+    
         filtered_map
     }
-
+    
 
     // Writes content to the specified output file (-o option)
     //  
