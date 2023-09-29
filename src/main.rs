@@ -53,45 +53,52 @@ impl Default for DataSurgeon {
             .long("file")
             .help("File to extract information from")
             .action(clap::ArgAction::Set)
+            .default_value("")
         )
         .arg(Arg::new("add")
             .long("add")
             .help("Adds a plugin from a GitHub repository (e.g ds --add https://github.com/Drew-Alleman/ds-winreg-plugin/)")
             .action(clap::ArgAction::Set)
+            .default_value("")        
         )
         .arg(Arg::new("update")
             .long("update")
             .help("Updates a plugin from a GitHub repository. You can also use `ds --update all` to update all plugins. (e.g ds --update https://github.com/DataSurgeon-ds/ds-cve-plugin/)")
             .action(clap::ArgAction::Set)
+            .default_value("")
         )
         .arg(Arg::new("remove")
             .long("remove")
             .help("Removes a plugin from a GitHub repository (e.g ds --remove https://github.com/Drew-Alleman/ds-winreg-plugin/)")
             .action(clap::ArgAction::Set)
+            .default_value("")
         )
         .arg(Arg::new("list")
             .long("list")
             .help("List all added plugins")
-            .action(clap::ArgAction::SetTrue)
+            .action(clap::ArgAction::SetTrue) 
+
         )
         .arg(
             Arg::new("clean")
             .short('C')
             .long("clean")
             .help("Only displays the matched result, rather than the entire line")
-            .action(clap::ArgAction::SetTrue)
+            .action(clap::ArgAction::SetTrue)            
         )
         .arg(
             Arg::new("directory")
             .long("directory")
             .help("Process all files found in the specified directory")
             .action(clap::ArgAction::Set)
+             .default_value("")
         )
         .arg(
             Arg::new("ignore")
             .long("ignore")
             .help("Silences error messages")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(
             Arg::new("count")
@@ -99,12 +106,14 @@ impl Default for DataSurgeon {
             .short('l')
             .help("Displays the line number where the match occurred")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("thorough")
             .short('T')
             .long("thorough")
             .help("Doesn't stop at first match (useful for -C if multiple unique matches are on the same line")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("display")
             .short('D')
@@ -117,130 +126,155 @@ impl Default for DataSurgeon {
             .long("suppress")
             .help("Suppress the 'Reading standard input' message when not providing a file")
             .action(clap::ArgAction::SetTrue)
-
         )
         .arg(Arg::new("drop")
              .long("drop")
              .help("Specify a regular expression to exclude certain patterns from the search. (e.g --drop \"^.{1,10}$\" will hide all matches not under 10 characters)")
              .action(clap::ArgAction::Set)
+             .default_value("")
         )
         .arg(Arg::new("filter")
              .long("filter")
              .help("Include only lines that match the specified regex. (e.g: '--filter ^error' will only include lines that start with the word 'error'")
              .action(clap::ArgAction::Set)
+             .default_value("")
         )
         .arg(Arg::new("hide")
             .short('X')
             .long("hide")
             .help("Hides the identifier string infront of the desired content (e.g: 'hash: ', 'url: ', 'email: ' will not be displayed.")
            .action(clap::ArgAction::SetTrue)
+           
         )
         .arg(Arg::new("output")
             .short('o')
             .long("output")
             .help("Output's the results of the procedure to a local file (recommended for large files)")
             .action(clap::ArgAction::Set)
+            .default_value("") 
         )
         .arg(Arg::new("time")
             .short('t')
             .long("time")
             .help("Time how long the operation took")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("email")
             .short('e')
             .long("email")
             .help("Extract email addresses")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("phone_number")
             .short('p')
             .long("phone")
             .help("Extracts phone numbers")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("hashes")
             .short('H')
             .long("hash")
             .help("Extract hashes (NTLM, LM, bcrypt, Oracle, MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, MD4)")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("ip_address")
             .short('i')
             .long("ip-addr")
             .help("Extract IP addresses")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("ipv6_address")
             .short('6')
             .long("ipv6-addr")
             .help("Extract IPv6 addresses")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("mac_address")
             .short('m')
             .long("mac-addr")
             .help("Extract MAC addresses")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("credit_card")
             .short('c')
             .long("credit-card")
             .help("Extract credit card numbers")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("url")
             .short('u')
             .long("url")
             .help("Extract urls")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("files")
             .short('F')
             .long("files")
             .help("Extract filenames")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("bitcoin_wallet")
             .short('b')
             .long("bitcoin")
             .help("Extract bitcoin wallets")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("aws_keys")
             .short('a')
             .long("aws")
             .help("Extract AWS keys")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("google")
             .short('g')
             .long("google")
             .help("Extract Google service account private key ids (used for google automations services)")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("srv_dns")
             .short('d')
             .long("dns")
             .help("Extract Domain Name System records")
             .action(clap::ArgAction::SetTrue)
+            
         )
         .arg(Arg::new("social_security")
             .short('s')
             .long("social")
             .help("Extract social security numbers")
             .action(clap::ArgAction::SetTrue)
+            
         );
         let args: Vec<_> = plugins
             .iter()
-            .map(|plugin| (plugin.content_type.clone(), plugin.arg_long_name.clone(), plugin.help_message.clone()))
+            .map(|plugin| {
+                (
+                    plugin.content_type.clone(),
+                    plugin.arg_long_name.clone(),
+                    plugin.help_message.clone(),
+                )
+            })
             .collect();
 
+        // Load the plugins and creates them as clap arguments
         for (content_type, arg_long_name, help_message) in args {
             let content_type = Box::leak(content_type.into_boxed_str());
             let arg_long_name = Box::leak(arg_long_name.into_boxed_str());
             let help_message = Box::leak(help_message.into_boxed_str());
-        
+
             let arg = Arg::new(&*content_type)
                 .long(&*arg_long_name)
                 .help(&*help_message)
@@ -500,10 +534,10 @@ impl  DataSurgeon {
 
     // Used to build the attributes in the clap args
     fn build_arguments(&mut self) -> () {
-        let update_plugin_url = self.matches.get_one::<String>("update").unwrap_or(&String::new()).to_string().to_owned();
-        let add_url = self.matches.get_one::<String>("add").unwrap_or(&String::new()).to_string().to_owned();
-        let remove_url = self.matches.get_one::<String>("remove").unwrap_or(&String::new()).to_string().to_owned();
-        let list = *self.matches.get_one::<bool>("list").unwrap_or(&false);
+        let update_plugin_url = self.matches.get_one::<String>("update").unwrap().to_string();
+        let add_url = self.matches.get_one::<String>("add").unwrap().to_string();
+        let remove_url = self.matches.get_one::<String>("remove").unwrap().to_string();
+        let list = *self.matches.get_one::<bool>("list").unwrap();
         if list {
             list_plugins();
             std::process::exit(1);
@@ -533,18 +567,30 @@ impl  DataSurgeon {
             }
             std::process::exit(1);
         }
-        self.output_file = self.matches.get_one::<String>("output").unwrap_or(&String::new()).to_string().to_owned();
+        self.output_file = self
+            .matches
+            .get_one::<String>("output")
+            .unwrap()
+            .to_string();
         self.is_output = !self.output_file.is_empty();
-        self.clean = *self.matches.get_one::<bool>("clean").unwrap_or(&false);
-        self.count = *self.matches.get_one::<bool>("count").unwrap_or(&false);
-        self.thorough = *self.matches.get_one::<bool>("thorough").unwrap_or(&false);
-        self.hide_type = *self.matches.get_one::<bool>("hide").unwrap_or(&false);
-        self.display = *self.matches.get_one::<bool>("display").unwrap_or(&false);
-        self.ignore = *self.matches.get_one::<bool>("ignore").unwrap_or(&false);
-        self.filename = self.matches.get_one::<String>("file").unwrap_or(&String::new()).to_string().to_owned();
-        self.directory = self.matches.get_one::<String>("directory").unwrap_or(&String::new()).to_string().to_owned();
-        self.drop = self.matches.get_one::<String>("drop").unwrap_or(&String::new()).to_string().to_owned();
-        self.filter = self.matches.get_one::<String>("filter").unwrap_or(&String::new()).to_string().to_owned();
+        self.clean = *self.matches.get_one::<bool>("clean").unwrap();
+        self.count = *self.matches.get_one::<bool>("count").unwrap();
+        self.thorough = *self.matches.get_one::<bool>("thorough").unwrap();
+        self.hide_type = *self.matches.get_one::<bool>("hide").unwrap();
+        self.display = *self.matches.get_one::<bool>("display").unwrap();
+        self.ignore = *self.matches.get_one::<bool>("ignore").unwrap();
+        self.filename = self.matches.get_one::<String>("file").unwrap().to_string();
+        self.directory = self
+            .matches
+            .get_one::<String>("directory")
+            .unwrap()
+            .to_string();
+        self.drop = self.matches.get_one::<String>("drop").unwrap().to_string();
+        self.filter = self
+            .matches
+            .get_one::<String>("filter")
+            .unwrap()
+            .to_string();
         if !self.drop.is_empty() {
             self.drop_regex = Regex::new(&self.drop).unwrap();
         }
